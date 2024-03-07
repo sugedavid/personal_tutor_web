@@ -23,14 +23,14 @@ import {
   FiSettings,
   FiMenu,
   FiLogOut,
+  FiMessageSquare,
+  FiUser,
 } from 'react-icons/fi';
 import { useRouter } from 'next/navigation';
 
 const LinkItems = [
-  { name: 'Home', icon: FiHome, path: '/home' },
-  { name: 'Trending', icon: FiTrendingUp, path: '/home' },
-  { name: 'Explore', icon: FiCompass, path: '/home' },
-  { name: 'Favourites', icon: FiStar, path: '/home' },
+  { name: 'Chats', icon: FiMessageSquare, path: '/home' },
+  { name: 'Tutors', icon: FiUser, path: '/home' },
   { name: 'Settings', icon: FiSettings, path: '/home' },
   { name: 'Sign out', icon: FiLogOut, path: '/sign_in' },
 ];
@@ -61,6 +61,7 @@ export default function SimpleSidebar() {
   );
 }
 
+// sidebar component
 const SidebarContent = ({ onClose, ...rest }) => {
   const router = useRouter();
   const handleNavigation = (path) => {
@@ -77,8 +78,8 @@ const SidebarContent = ({ onClose, ...rest }) => {
       {...rest}
     >
       <Flex h='20' alignItems='center' mx='8' justifyContent='space-between'>
-        <Text fontSize='2xl' fontFamily='monospace' fontWeight='bold'>
-          Logo
+        <Text fontSize='xl' fontFamily='monospace' fontWeight='bold'>
+          Personal Tutor
         </Text>
         <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
       </Flex>
@@ -96,6 +97,7 @@ const SidebarContent = ({ onClose, ...rest }) => {
   );
 };
 
+// nav item component
 const NavItem = ({ icon, onClick, children, ...rest }) => {
   return (
     <Box
@@ -113,7 +115,7 @@ const NavItem = ({ icon, onClick, children, ...rest }) => {
         role='group'
         cursor='pointer'
         _hover={{
-          bg: 'cyan.400',
+          bg: 'blue.500',
           color: 'white',
         }}
         {...rest}

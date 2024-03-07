@@ -1,31 +1,49 @@
 'use client';
 
+import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import {
-  Flex,
   Box,
+  Button,
+  Flex,
   FormControl,
+  FormErrorMessage,
+  FormHelperText,
   FormLabel,
+  Heading,
   Input,
   InputGroup,
-  HStack,
   InputRightElement,
+  Link,
   Stack,
-  Button,
-  Heading,
   Text,
   useColorModeValue,
-  Link,
+  useToast,
 } from '@chakra-ui/react';
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
+import React from 'react';
+import { useForm } from 'react-hook-form';
 
 export default function SignInPage() {
-  const [showPassword, setShowPassword] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm(); // Destructure formState.errors
+  const [showPassword, setShowPassword] = React.useState(false);
   const router = useRouter();
-  const handleNavigate = () => {
+  const toast = useToast();
+
+  const onSubmit = ({ email, password }) => {
+    toast({
+      title: 'Signed in successfully.',
+      description: "We've signed you in.",
+      status: 'success',
+      duration: 9000,
+      isClosable: true,
+    });
     router.push('/home');
   };
+
   return (
     <Flex
       minH={'100vh'}
@@ -48,16 +66,49 @@ export default function SignInPage() {
         >
           <Stack spacing={4}>
             {/* email */}
-            <FormControl id='email' isRequired w={400}>
+            <FormControl
+              id='email'
+              isRequired
+              isInvalid={errors?.email}
+              w={400}
+            >
               <FormLabel>Email address</FormLabel>
-              <Input type='email' />
+              <Input
+                type='email'
+                name='email'
+                {...register('email', {
+                  required: true,
+                  pattern: {
+                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+                    message: 'Invalid email address',
+                  },
+                })}
+              />
+              {/* <FormHelperText>Well never share your email.</FormHelperText> */}
+              <FormErrorMessage>{errors?.email?.message}</FormErrorMessage>
             </FormControl>
 
             {/* password */}
-            <FormControl id='password' isRequired>
+            <FormControl
+              id='password'
+              isRequired
+              isInvalid={errors?.password}
+              w={400}
+            >
               <FormLabel>Password</FormLabel>
+
               <InputGroup>
-                <Input type={showPassword ? 'text' : 'password'} />
+                <Input
+                  type={showPassword ? 'text' : 'password'}
+                  name='password'
+                  {...register('password', {
+                    required: true,
+                    minLength: {
+                      value: 6,
+                      message: 'Password must be at least 6 characters long',
+                    },
+                  })}
+                />
                 <InputRightElement h={'full'}>
                   <Button
                     variant={'ghost'}
@@ -69,11 +120,13 @@ export default function SignInPage() {
                   </Button>
                 </InputRightElement>
               </InputGroup>
+              <FormErrorMessage>{errors?.password?.message}</FormErrorMessage>
             </FormControl>
 
-            {/* sign in */}
+            {/* sign in cta */}
             <Stack spacing={10} pt={2}>
               <Button
+                type='submit' // Add type="submit" to trigger form submission
                 loadingText='Submitting'
                 size='lg'
                 bg={'blue.400'}
@@ -81,7 +134,7 @@ export default function SignInPage() {
                 _hover={{
                   bg: 'blue.500',
                 }}
-                onClick={handleNavigate}
+                onClick={handleSubmit(onSubmit)}
               >
                 Sign in
               </Button>
