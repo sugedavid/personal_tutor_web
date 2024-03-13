@@ -2,6 +2,9 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
 import { fonts } from './fonts';
+import { Theme, ThemePanel } from '@radix-ui/themes';
+import { ThemeProvider } from 'next-themes';
+import '@radix-ui/themes/styles.css';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -14,7 +17,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang='en' className={fonts.rubik.variable}>
       <body className={inter.className}>
-        <Providers>{children}</Providers>
+        <Theme>
+          <Providers>{children}</Providers>
+        </Theme>
       </body>
     </html>
   );

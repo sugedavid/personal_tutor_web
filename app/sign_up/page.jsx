@@ -10,17 +10,38 @@ import {
   HStack,
   InputRightElement,
   Stack,
-  Button,
   Heading,
-  Text,
   useColorModeValue,
-  Link,
+  FormErrorMessage,
+  useToast,
 } from '@chakra-ui/react';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
+import { Button, IconButton, Text, Link } from '@radix-ui/themes';
+import { useForm } from 'react-hook-form';
 
 export default function SignUpPage() {
+  const router = useRouter();
+  const toast = useToast();
   const [showPassword, setShowPassword] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
+  const onSubmit = ({ email, password }) => {
+    toast({
+      title: 'Registered in successfully.',
+      status: 'success',
+      duration: 9000,
+      isClosable: true,
+    });
+    router.push('/chats');
+  };
+
   return (
     <Flex
       minH={'100vh'}
@@ -61,40 +82,57 @@ export default function SignUpPage() {
             </HStack>
 
             {/* email */}
-            <FormControl id='email' isRequired>
+            <FormControl id='email' isRequired isInvalid={errors?.email}>
               <FormLabel>Email address</FormLabel>
-              <Input type='email' />
+              <Input
+                type='email'
+                name='email'
+                {...register('email', {
+                  required: true,
+                  pattern: {
+                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+                    message: 'Invalid email address',
+                  },
+                })}
+              />
+              <FormErrorMessage>{errors?.email?.message}</FormErrorMessage>
             </FormControl>
 
             {/* password */}
-            <FormControl id='password' isRequired>
+            <FormControl id='password' isRequired isInvalid={errors?.password}>
               <FormLabel>Password</FormLabel>
               <InputGroup>
-                <Input type={showPassword ? 'text' : 'password'} />
+                <Input
+                  type={showPassword ? 'text' : 'password'}
+                  name='password'
+                  {...register('password', {
+                    required: true,
+                    minLength: {
+                      value: 6,
+                      message: 'Password must be at least 6 characters long',
+                    },
+                  })}
+                />
                 <InputRightElement h={'full'}>
-                  <Button
+                  <IconButton
                     variant={'ghost'}
                     onClick={() =>
                       setShowPassword((showPassword) => !showPassword)
                     }
                   >
                     {showPassword ? <ViewIcon /> : <ViewOffIcon />}
-                  </Button>
+                  </IconButton>
                 </InputRightElement>
               </InputGroup>
+              <FormErrorMessage>{errors?.password?.message}</FormErrorMessage>
             </FormControl>
 
             {/* sign up */}
             <Stack spacing={10} pt={2}>
               <Button
                 loadingText='Submitting'
-                size='lg'
-                bg={'blue.400'}
-                color={'white'}
-                _hover={{
-                  bg: 'blue.500',
-                }}
-                href='/home'
+                size='3'
+                onClick={handleSubmit(onSubmit)}
               >
                 Continue
               </Button>
