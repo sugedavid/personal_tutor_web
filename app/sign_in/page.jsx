@@ -3,22 +3,19 @@
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import {
   Box,
-  Button,
   Flex,
   FormControl,
   FormErrorMessage,
-  FormHelperText,
   FormLabel,
   Heading,
   Input,
   InputGroup,
   InputRightElement,
-  Link,
   Stack,
-  Text,
   useColorModeValue,
   useToast,
 } from '@chakra-ui/react';
+import { Button, IconButton, Text, Link } from '@radix-ui/themes';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import { useForm } from 'react-hook-form';
@@ -28,7 +25,8 @@ export default function SignInPage() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm(); // Destructure formState.errors
+  } = useForm();
+
   const [showPassword, setShowPassword] = React.useState(false);
   const router = useRouter();
   const toast = useToast();
@@ -36,12 +34,11 @@ export default function SignInPage() {
   const onSubmit = ({ email, password }) => {
     toast({
       title: 'Signed in successfully.',
-      description: "We've signed you in.",
       status: 'success',
       duration: 9000,
       isClosable: true,
     });
-    router.push('/home');
+    router.push('/chats');
   };
 
   return (
@@ -84,7 +81,6 @@ export default function SignInPage() {
                   },
                 })}
               />
-              {/* <FormHelperText>Well never share your email.</FormHelperText> */}
               <FormErrorMessage>{errors?.email?.message}</FormErrorMessage>
             </FormControl>
 
@@ -110,14 +106,14 @@ export default function SignInPage() {
                   })}
                 />
                 <InputRightElement h={'full'}>
-                  <Button
-                    variant={'ghost'}
+                  <IconButton
+                    variant='ghost'
                     onClick={() =>
                       setShowPassword((showPassword) => !showPassword)
                     }
                   >
                     {showPassword ? <ViewIcon /> : <ViewOffIcon />}
-                  </Button>
+                  </IconButton>
                 </InputRightElement>
               </InputGroup>
               <FormErrorMessage>{errors?.password?.message}</FormErrorMessage>
@@ -126,14 +122,9 @@ export default function SignInPage() {
             {/* sign in cta */}
             <Stack spacing={10} pt={2}>
               <Button
-                type='submit' // Add type="submit" to trigger form submission
+                type='submit'
                 loadingText='Submitting'
-                size='lg'
-                bg={'blue.400'}
-                color={'white'}
-                _hover={{
-                  bg: 'blue.500',
-                }}
+                size={'3'}
                 onClick={handleSubmit(onSubmit)}
               >
                 Sign in
