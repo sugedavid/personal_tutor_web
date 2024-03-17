@@ -39,7 +39,7 @@ export default function SignUpPage() {
       duration: 9000,
       isClosable: true,
     });
-    router.push('/chats');
+    router.push('/dashboard');
   };
 
   return (
