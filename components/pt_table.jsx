@@ -1,24 +1,39 @@
 // app/components/pt_table.jsx
-import { FiEdit, FiPlus, FiTrash } from 'react-icons/fi';
-import PtModal from './pt_modal';
+import { Progress } from '@chakra-ui/react';
 import {
-  Table,
-  Flex,
-  Badge,
+  AlertDialog,
   Button,
-  IconButton,
-  Text,
   Container,
   Dialog,
-  AlertDialog,
+  Flex,
+  IconButton,
+  Table,
+  Text,
 } from '@radix-ui/themes';
+import { FiEdit, FiPlus, FiTrash } from 'react-icons/fi';
 import PtAlertDialog from './pt_alert_dialog';
+import PtTutorModal from './pt_tutor_modal';
 
-export default function PtTable({ data }) {
+export default function PtTable({
+  data,
+  isLoading,
+  error,
+  onCreate,
+  onUpdate,
+  onDelete,
+}) {
+  if (isLoading) {
+    return <Progress size='xs' isIndeterminate color='violet' />;
+  }
+
   return (
     <Container ml='10' mr='10' mt='4'>
       {/* modal */}
-      <PtModal title={'Create Tutor'} subtitle={'Create a new tutor.'}>
+      <PtTutorModal
+        title={'Create Personal Tutor'}
+        subtitle={'Personal tutor details'}
+        onSave={onCreate}
+      >
         <Flex justify='between'>
           {/* title */}
           <Flex direction='column'>
@@ -37,23 +52,33 @@ export default function PtTable({ data }) {
             </Button>
           </Dialog.Trigger>
         </Flex>
-      </PtModal>
+      </PtTutorModal>
 
       {/* table */}
+
       <Table.Root variant='surface' mt='4'>
         <Table.Header>
           <Table.Row>
             <Table.ColumnHeaderCell>Name</Table.ColumnHeaderCell>
             <Table.ColumnHeaderCell>Model</Table.ColumnHeaderCell>
             <Table.ColumnHeaderCell>Instruction</Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell>Created at</Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell>Created</Table.ColumnHeaderCell>
             <Table.ColumnHeaderCell>Action</Table.ColumnHeaderCell>
           </Table.Row>
         </Table.Header>
 
         <Table.Body>
           {
-            // Check if data is empty
+            // Check if error
+            error ? (
+              <Table.Row>
+                <Table.Cell colSpan={5} align='center'>
+                  <Text align='center'>
+                    Something went wrong. Please try again later.
+                  </Text>
+                </Table.Cell>
+              </Table.Row>
+            ) : // Check if data is empty
             data?.length === 0 ? (
               <Table.Row>
                 <Table.Cell colSpan={2}>No data available</Table.Cell>
@@ -83,17 +108,18 @@ export default function PtTable({ data }) {
                   <Table.Cell>
                     <Flex gap='3'>
                       {/* edit */}
-                      <PtModal
+                      <PtTutorModal
                         title={'Edit Personal Tutor'}
-                        subtitle={'Personal Tutor details.'}
+                        subtitle={'Personal tutor details'}
                         item={item}
+                        onSave={onUpdate}
                       >
                         <Dialog.Trigger>
                           <IconButton variant='soft'>
                             <FiEdit />
                           </IconButton>
                         </Dialog.Trigger>
-                      </PtModal>
+                      </PtTutorModal>
 
                       {/* delete */}
                       <PtAlertDialog
@@ -105,6 +131,8 @@ export default function PtTable({ data }) {
                             undone.
                           </>
                         }
+                        buttonTitle={'Delete'}
+                        onSubmit={() => onDelete(item.id)}
                       >
                         <AlertDialog.Trigger>
                           <IconButton variant='soft' color='red'>

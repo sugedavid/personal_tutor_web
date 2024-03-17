@@ -1,15 +1,33 @@
 // components/pt_modal.jsx
 
 import {
+  Button,
   Dialog,
   Flex,
-  TextField,
   Text,
-  Button,
   TextArea,
+  TextField,
 } from '@radix-ui/themes';
+import { useState } from 'react';
 
-export default function PtModal({ title, subtitle, item, children }) {
+export default function PtTutorModal({
+  title,
+  subtitle,
+  item,
+  onSave,
+  children,
+}) {
+  const [name, setName] = useState('');
+  const [instruction, setInstruction] = useState('');
+
+  const handleNameChange = (event) => {
+    setName(event.target.value);
+  };
+
+  const handleInstructionChange = (event) => {
+    setInstruction(event.target.value);
+  };
+
   return (
     <Dialog.Root>
       {children}
@@ -28,6 +46,7 @@ export default function PtModal({ title, subtitle, item, children }) {
             <TextField.Input
               defaultValue={item?.name}
               placeholder='Enter name'
+              onChange={handleNameChange}
             />
           </label>
           <label>
@@ -36,8 +55,8 @@ export default function PtModal({ title, subtitle, item, children }) {
             </Text>
             <TextField.Input
               disabled='true'
-              defaultValue={item?.model}
-              placeholder='Enter your email'
+              defaultValue={item?.model || 'gpt-3.5-turbo-1106'}
+              placeholder='Enter model'
             />
           </label>
           <label>
@@ -47,6 +66,7 @@ export default function PtModal({ title, subtitle, item, children }) {
             <TextArea
               defaultValue={item?.instructions}
               placeholder='Enter instruction'
+              onChange={handleInstructionChange}
             />
           </label>
         </Flex>
@@ -58,7 +78,23 @@ export default function PtModal({ title, subtitle, item, children }) {
             </Button>
           </Dialog.Close>
           <Dialog.Close>
-            <Button>Save</Button>
+            <Button
+              onClick={() =>
+                item?.id
+                  ? onSave(item?.id, {
+                      name: name,
+                      instructions: instruction,
+                      tools: [],
+                    })
+                  : onSave({
+                      name: name,
+                      instructions: instruction,
+                      tools: [],
+                    })
+              }
+            >
+              Save
+            </Button>
           </Dialog.Close>
         </Flex>
       </Dialog.Content>

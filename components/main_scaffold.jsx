@@ -18,9 +18,11 @@ import {
   useColorModeValue,
   useDisclosure,
 } from '@chakra-ui/react';
+import { AlertDialog } from '@radix-ui/themes';
 import { useRouter } from 'next/navigation';
 import {
   FiBell,
+  FiBook,
   FiChevronDown,
   FiLogOut,
   FiMenu,
@@ -29,11 +31,11 @@ import {
   FiUser,
 } from 'react-icons/fi';
 import PtAlertDialog from './pt_alert_dialog';
-import { AlertDialog } from '@radix-ui/themes';
 
 const NavigationItems = [
   { name: 'Chats', icon: FiMessageSquare, path: '/dashboard/chats' },
   { name: 'Tutors', icon: FiUser, path: '/dashboard/tutors' },
+  { name: 'Modules', icon: FiBook, path: '/dashboard/modules' },
   { name: 'Settings', icon: FiSettings, path: '/dashboard/settings' },
   { name: 'Sign out', icon: FiLogOut, path: '/sign_in' },
 ];
@@ -42,7 +44,7 @@ export default function MainScaffold({ children }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
-    <Box minH='100vh' bg={useColorModeValue('white', 'gray.900')}>
+    <Box minH='100vh' bg='white'>
       <SidebarContent
         onClose={onClose}
         display={{ base: 'none', md: 'block' }}
@@ -82,7 +84,7 @@ const SidebarContent = ({ onClose, ...rest }) => {
 
   return (
     <Box
-      bg={useColorModeValue('gray.100', 'gray.900')}
+      bg={'gray.100'}
       borderRight='1px'
       borderRightColor={useColorModeValue('gray.200', 'gray.700')}
       w={{ base: 'full', md: 60 }}
@@ -202,7 +204,7 @@ const MobileNav = ({ onOpen, ...rest }) => {
       px={{ base: 4, md: 4 }}
       height='20'
       alignItems='center'
-      bg={useColorModeValue('white', 'gray.900')}
+      bg={'white'}
       borderBottomWidth='1px'
       borderBottomColor={useColorModeValue('gray.200', 'gray.700')}
       justifyContent={{ base: 'space-between', md: 'flex-end' }}
@@ -263,14 +265,13 @@ const MobileNav = ({ onOpen, ...rest }) => {
               </HStack>
             </MenuButton>
             <MenuList
-              bg={useColorModeValue('white', 'gray.900')}
+              bg={'white'}
               borderColor={useColorModeValue('gray.200', 'gray.700')}
             >
               <MenuItem>Profile</MenuItem>
-              <MenuItem>Settings</MenuItem>
               <MenuItem>Billing</MenuItem>
               <MenuDivider />
-              <MenuItem>Sign out</MenuItem>
+              <MenuItem color={'red.500'}>Sign out</MenuItem>
             </MenuList>
           </Menu>
         </Flex>
