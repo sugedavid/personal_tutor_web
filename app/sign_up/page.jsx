@@ -34,9 +34,9 @@ export default function SignUpPage() {
 
   const onSubmit = ({ email, password }) => {
     toast({
-      title: 'Registered in successfully.',
+      title: 'Registered successfully.',
       status: 'success',
-      duration: 9000,
+      duration: 3000,
       isClosable: true,
     });
     router.push('/dashboard');
