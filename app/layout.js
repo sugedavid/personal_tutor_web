@@ -17,7 +17,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang='en' className={fonts.rubik.variable}>
       <body className={inter.className}>
-        <Theme>
+        <Theme accentColor='violet'>
           <Providers>{children}</Providers>
         </Theme>
       </body>

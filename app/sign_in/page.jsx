@@ -38,7 +38,7 @@ export default function SignInPage() {
       duration: 9000,
       isClosable: true,
     });
-    router.push('/chats');
+    router.push('/dashboard');
   };
 
   return (

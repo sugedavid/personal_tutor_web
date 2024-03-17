@@ -1,8 +1,15 @@
 // components/pt_modal.jsx
 
-import { Dialog, Flex, TextField, Text, Button } from '@radix-ui/themes';
+import {
+  Dialog,
+  Flex,
+  TextField,
+  Text,
+  Button,
+  TextArea,
+} from '@radix-ui/themes';
 
-export default function PtModal({ title, subtitle, children }) {
+export default function PtModal({ title, subtitle, item, children }) {
   return (
     <Dialog.Root>
       {children}
@@ -19,7 +26,7 @@ export default function PtModal({ title, subtitle, children }) {
               Name
             </Text>
             <TextField.Input
-              defaultValue='Cloud Computing'
+              defaultValue={item?.name}
               placeholder='Enter name'
             />
           </label>
@@ -29,8 +36,17 @@ export default function PtModal({ title, subtitle, children }) {
             </Text>
             <TextField.Input
               disabled='true'
-              defaultValue='gpt 3.5'
+              defaultValue={item?.model}
               placeholder='Enter your email'
+            />
+          </label>
+          <label>
+            <Text as='div' size='2' mb='1' weight='bold'>
+              Instruction
+            </Text>
+            <TextArea
+              defaultValue={item?.instructions}
+              placeholder='Enter instruction'
             />
           </label>
         </Flex>

@@ -32,9 +32,9 @@ import PtAlertDialog from './pt_alert_dialog';
 import { AlertDialog } from '@radix-ui/themes';
 
 const NavigationItems = [
-  { name: 'Chats', icon: FiMessageSquare, path: '/chats' },
-  { name: 'Tutors', icon: FiUser, path: '/tutors' },
-  { name: 'Settings', icon: FiSettings, path: '/settings' },
+  { name: 'Chats', icon: FiMessageSquare, path: '/dashboard/chats' },
+  { name: 'Tutors', icon: FiUser, path: '/dashboard/tutors' },
+  { name: 'Settings', icon: FiSettings, path: '/dashboard/settings' },
   { name: 'Sign out', icon: FiLogOut, path: '/sign_in' },
 ];
 

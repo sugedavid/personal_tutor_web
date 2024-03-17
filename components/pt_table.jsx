@@ -14,7 +14,7 @@ import {
 } from '@radix-ui/themes';
 import PtAlertDialog from './pt_alert_dialog';
 
-export default function PtTable() {
+export default function PtTable({ data }) {
   return (
     <Container ml='10' mr='10' mt='4'>
       {/* modal */}
@@ -45,79 +45,79 @@ export default function PtTable() {
           <Table.Row>
             <Table.ColumnHeaderCell>Name</Table.ColumnHeaderCell>
             <Table.ColumnHeaderCell>Model</Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell>Created by</Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell>Instruction</Table.ColumnHeaderCell>
             <Table.ColumnHeaderCell>Created at</Table.ColumnHeaderCell>
             <Table.ColumnHeaderCell>Action</Table.ColumnHeaderCell>
           </Table.Row>
         </Table.Header>
 
         <Table.Body>
-          <Table.Row>
-            <Table.Cell>
-              <Flex gap='2'>
-                <Text>Cloud Computing</Text>
-                <Badge variant='soft'>Selected</Badge>
-              </Flex>
-            </Table.Cell>
-            <Table.Cell>gpt 3.5</Table.Cell>
-            <Table.Cell>John Doe</Table.Cell>
-            <Table.Cell>18/03/2024</Table.Cell>
-            <Table.Cell>
-              <Flex gap='3'>
-                {/* edit */}
-                <PtModal title={'Edit Tutor'} subtitle={'Edit tutor details.'}>
-                  <Dialog.Trigger>
-                    <IconButton variant='soft'>
-                      <FiEdit />
-                    </IconButton>
-                  </Dialog.Trigger>
-                </PtModal>
+          {
+            // Check if data is empty
+            data?.length === 0 ? (
+              <Table.Row>
+                <Table.Cell colSpan={2}>No data available</Table.Cell>
+              </Table.Row>
+            ) : (
+              data?.map((item) => (
+                <Table.Row key={item.id}>
+                  <Table.Cell>
+                    <Flex gap='2'>
+                      <Text>{item.name}</Text>
+                      {/* <Badge variant='soft'>{item.status}</Badge> */}
+                    </Flex>
+                  </Table.Cell>
+                  <Table.Cell>{item.model}</Table.Cell>
+                  <Table.Cell width={400}>{item.instructions}</Table.Cell>
+                  <Table.Cell>
+                    {' '}
+                    {new Date(item.created_at * 1000).toLocaleDateString(
+                      'en-GB',
+                      {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric',
+                      }
+                    )}
+                  </Table.Cell>
+                  <Table.Cell>
+                    <Flex gap='3'>
+                      {/* edit */}
+                      <PtModal
+                        title={'Edit Personal Tutor'}
+                        subtitle={'Personal Tutor details.'}
+                        item={item}
+                      >
+                        <Dialog.Trigger>
+                          <IconButton variant='soft'>
+                            <FiEdit />
+                          </IconButton>
+                        </Dialog.Trigger>
+                      </PtModal>
 
-                {/* delete */}
-                <PtAlertDialog
-                  title={'Delete Tutor'}
-                  description={'Are you sure? This action cannot be undone.'}
-                >
-                  <AlertDialog.Trigger>
-                    <IconButton variant='soft' color='red'>
-                      <FiTrash />
-                    </IconButton>
-                  </AlertDialog.Trigger>
-                </PtAlertDialog>
-              </Flex>
-            </Table.Cell>
-          </Table.Row>
-
-          <Table.Row>
-            <Table.RowHeaderCell>Cloud Computing</Table.RowHeaderCell>
-            <Table.Cell>gpt 3.5</Table.Cell>
-            <Table.Cell>John Doe</Table.Cell>
-            <Table.Cell>18/03/2024</Table.Cell>
-            <Table.Cell>
-              <Flex gap='3'>
-                {/* edit */}
-                <PtModal title={'Edit Tutor'} subtitle={'Edit tutor details.'}>
-                  <Dialog.Trigger>
-                    <IconButton variant='soft'>
-                      <FiEdit />
-                    </IconButton>
-                  </Dialog.Trigger>
-                </PtModal>
-
-                {/* delete */}
-                <PtAlertDialog
-                  title={'Delete Tutor'}
-                  description={'Are you sure? This action cannot be undone.'}
-                >
-                  <AlertDialog.Trigger>
-                    <IconButton variant='soft' color='red'>
-                      <FiTrash />
-                    </IconButton>
-                  </AlertDialog.Trigger>
-                </PtAlertDialog>
-              </Flex>
-            </Table.Cell>
-          </Table.Row>
+                      {/* delete */}
+                      <PtAlertDialog
+                        title={'Delete Personal Tutor'}
+                        description={
+                          <>
+                            Are you sure you want to delete{' '}
+                            <strong>{item.name}</strong>? This action cannot be
+                            undone.
+                          </>
+                        }
+                      >
+                        <AlertDialog.Trigger>
+                          <IconButton variant='soft' color='red'>
+                            <FiTrash />
+                          </IconButton>
+                        </AlertDialog.Trigger>
+                      </PtAlertDialog>
+                    </Flex>
+                  </Table.Cell>
+                </Table.Row>
+              ))
+            )
+          }
         </Table.Body>
       </Table.Root>
     </Container>
