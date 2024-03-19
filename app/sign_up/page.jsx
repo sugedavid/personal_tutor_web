@@ -1,30 +1,32 @@
 'use client';
 
+import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import {
-  Flex,
   Box,
+  Flex,
   FormControl,
+  FormErrorMessage,
   FormLabel,
+  HStack,
+  Heading,
   Input,
   InputGroup,
-  HStack,
   InputRightElement,
+  Spinner,
   Stack,
-  Heading,
   useColorModeValue,
-  FormErrorMessage,
   useToast,
 } from '@chakra-ui/react';
-import { useState } from 'react';
+import { Button, IconButton, Link, Text } from '@radix-ui/themes';
 import { useRouter } from 'next/navigation';
-import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
-import { Button, IconButton, Text, Link } from '@radix-ui/themes';
+import React from 'react';
 import { useForm } from 'react-hook-form';
 
 export default function SignUpPage() {
   const router = useRouter();
   const toast = useToast();
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [isSignUp, setSignUp] = React.useState(false);
 
   const {
     register,
@@ -33,6 +35,7 @@ export default function SignUpPage() {
   } = useForm();
 
   const onSubmit = ({ email, password }) => {
+    setSignUp(true);
     toast({
       title: 'Registered successfully.',
       status: 'success',
@@ -40,6 +43,7 @@ export default function SignUpPage() {
       isClosable: true,
     });
     router.push('/dashboard');
+    setSignUp(false);
   };
 
   return (
@@ -130,11 +134,15 @@ export default function SignUpPage() {
             {/* sign up */}
             <Stack spacing={10} pt={2}>
               <Button
-                loadingText='Submitting'
                 size='3'
                 onClick={handleSubmit(onSubmit)}
+                disabled={isSignUp}
               >
-                Continue
+                {isSignUp ? (
+                  <Spinner color='purple.600' loading={false} />
+                ) : (
+                  'Continue'
+                )}
               </Button>
             </Stack>
 

@@ -54,7 +54,7 @@ export default function PtTutorModal({
               Model
             </Text>
             <TextField.Input
-              disabled='true'
+              disabled={true}
               defaultValue={item?.model || 'gpt-3.5-turbo-1106'}
               placeholder='Enter model'
             />

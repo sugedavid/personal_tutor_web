@@ -2,8 +2,11 @@
 'use client';
 
 import PtTable from '@/components/pt_table';
+import firebase_app from '@/firebase';
 import { useToast } from '@chakra-ui/react';
+import { getAuth } from 'firebase/auth';
 import { ErrorBoundary } from 'next/dist/client/components/error-boundary';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Error from '../error';
 
@@ -11,42 +14,62 @@ export default function TutorsPage() {
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [pdateError, setUpdateError] = useState(null);
+  const [updateError, setUpdateError] = useState(null);
 
+  const router = useRouter();
   const toast = useToast();
+
+  const auth = getAuth(firebase_app);
+  const user = auth.currentUser;
 
   useEffect(() => {
     fetchTutors();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // fetch tutors
   const fetchTutors = async () => {
-    setIsLoading(true);
-    try {
-      const res = await fetch('http://127.0.0.1:8000/v1/tutors');
-      if (!res.ok) {
-        throw new Error('Failed to fetch data');
-      }
+    if (user !== null) {
+      setIsLoading(true);
+      const idToken = await user.getIdToken();
+      try {
+        const query = { token: idToken };
+        const queryString = new URLSearchParams(query).toString();
+        const res = await fetch(
+          `http://127.0.0.1:8000/v1/tutors?${queryString}`
+        );
+        if (!res.ok) {
+          throw new Error('Failed to fetch data');
+        }
 
-      const data = await res.json();
-      setData(data.data);
-    } catch (err) {
-      setError(err);
-    } finally {
-      setIsLoading(false);
+        const data = await res.json();
+        setData(data.data);
+      } catch (err) {
+        setError(err);
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      router.push('/sign_in');
     }
   };
 
   // create tutor
   const createTutor = async (createData) => {
     try {
-      const res = await fetch('http://127.0.0.1:8000/v1/tutors', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(createData),
-      });
+      const idToken = await user.getIdToken();
+      const query = { token: idToken };
+      const queryString = new URLSearchParams(query).toString();
+      const res = await fetch(
+        `http://127.0.0.1:8000/v1/tutors?${queryString}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(createData),
+        }
+      );
       if (!res.ok) {
         throw new Error('Failed to create personal tutor');
       }
@@ -62,8 +85,11 @@ export default function TutorsPage() {
   // update tutor
   const updateTutor = async (assistantId, updatedData) => {
     try {
+      const idToken = await user.getIdToken();
+      const query = { token: idToken };
+      const queryString = new URLSearchParams(query).toString();
       const res = await fetch(
-        `http://127.0.0.1:8000/v1/tutors/${assistantId}`,
+        `http://127.0.0.1:8000/v1/tutors/${assistantId}?${queryString}`,
         {
           method: 'PUT',
           headers: {
@@ -87,8 +113,11 @@ export default function TutorsPage() {
   // delete tutor
   const deleteTutor = async (assistantId) => {
     try {
+      const idToken = await user.getIdToken();
+      const query = { token: idToken };
+      const queryString = new URLSearchParams(query).toString();
       const res = await fetch(
-        `http://127.0.0.1:8000/v1/tutors/${assistantId}`,
+        `http://127.0.0.1:8000/v1/tutors/${assistantId}?${queryString}`,
         {
           method: 'DELETE',
           headers: {
