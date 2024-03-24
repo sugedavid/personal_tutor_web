@@ -17,6 +17,7 @@ import {
   VStack,
   useColorModeValue,
   useDisclosure,
+  useToast,
 } from '@chakra-ui/react';
 import { AlertDialog } from '@radix-ui/themes';
 import { useRouter } from 'next/navigation';
@@ -31,6 +32,9 @@ import {
   FiUser,
 } from 'react-icons/fi';
 import PtAlertDialog from './pt_alert_dialog';
+
+import firebase_app from '@/firebase';
+import { getAuth, signOut } from 'firebase/auth';
 
 const NavigationItems = [
   { name: 'Chats', icon: FiMessageSquare, path: '/dashboard/chats' },
@@ -78,8 +82,34 @@ export default function MainScaffold({ children }) {
 // sidebar component
 const SidebarContent = ({ onClose, ...rest }) => {
   const router = useRouter();
+  const toast = useToast();
+
+  const auth = getAuth(firebase_app);
+
   const handleNavigation = (path) => {
-    router.push(path);
+    if (path === '/sign_in') {
+      signOut(auth)
+        .then(() => {
+          toast({
+            title: 'Signed out successfully.',
+            status: 'success',
+            duration: 3000,
+            isClosable: true,
+          });
+          router.push(path);
+        })
+        .catch((error) => {
+          toast({
+            title: 'Oops! Could not sign you out.',
+            description: error,
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+          });
+        });
+    } else {
+      router.push(path);
+    }
   };
 
   return (

@@ -46,7 +46,7 @@ export default function ChatsPage() {
     if (scrollAreaRef.current) {
       scrollAreaRef.current.scrollTo({
         top: scrollAreaRef.current.scrollHeight,
-        behavior: 'smooth', // Optional: You can use 'auto' for instant scroll
+        behavior: 'smooth', // Optional: use 'auto' for instant scroll
       });
     }
   };
