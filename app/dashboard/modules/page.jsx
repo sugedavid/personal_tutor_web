@@ -76,9 +76,7 @@ export default function ModulesPage() {
       try {
         const query = { token: idToken };
         const queryString = new URLSearchParams(query).toString();
-        const res = await fetch(`${url}v1/modules?${queryString}`, {
-          redirect: 'manual',
-        });
+        const res = await fetch(`${url}v1/modules?${queryString}`);
         if (!res.ok) {
           throw new Error('Failed to fetch data');
         }
