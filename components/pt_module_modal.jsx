@@ -3,29 +3,27 @@
 import {
   Button,
   Dialog,
+  DropdownMenu,
   Flex,
   Text,
-  TextArea,
   TextField,
 } from '@radix-ui/themes';
 import { useState } from 'react';
+import { FiChevronDown } from 'react-icons/fi';
 
-export default function PtTutorModal({
+export default function PtModuleModal({
   title,
   subtitle,
   item,
+  tutors,
   onSave,
   children,
 }) {
-  const [name, setName] = useState('');
-  const [instruction, setInstruction] = useState('');
+  const [name, setName] = useState(item?.name);
+  const [tutor, setTutor] = useState(item?.assistant);
 
   const handleNameChange = (event) => {
     setName(event.target.value);
-  };
-
-  const handleInstructionChange = (event) => {
-    setInstruction(event.target.value);
   };
 
   return (
@@ -51,23 +49,26 @@ export default function PtTutorModal({
           </label>
           <label>
             <Text as='div' size='2' mb='1' weight='bold'>
-              Model
+              Tutor
             </Text>
-            <TextField.Input
-              disabled={true}
-              defaultValue={item?.model || 'gpt-3.5-turbo-1106'}
-              placeholder='Enter model'
-            />
-          </label>
-          <label>
-            <Text as='div' size='2' mb='1' weight='bold'>
-              Instruction
-            </Text>
-            <TextArea
-              defaultValue={item?.instructions}
-              placeholder='Enter instruction'
-              onChange={handleInstructionChange}
-            />
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger>
+                <Button variant='soft'>
+                  {!tutor ? 'Select tutor' : tutor.name}
+                  <FiChevronDown />
+                </Button>
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Content>
+                {tutors?.map((item) => (
+                  <DropdownMenu.Item
+                    key={item.id}
+                    onSelect={() => setTutor(item)}
+                  >
+                    {item.name}
+                  </DropdownMenu.Item>
+                ))}
+              </DropdownMenu.Content>
+            </DropdownMenu.Root>
           </label>
         </Flex>
 
@@ -79,18 +80,16 @@ export default function PtTutorModal({
           </Dialog.Close>
           <Dialog.Close>
             <Button
-              disabled={!name}
+              disabled={!name || !tutor}
               onClick={() =>
                 item?.id
                   ? onSave(item?.id, {
                       name: name,
-                      instructions: instruction,
-                      tools: [],
+                      assistant_id: tutor.id,
                     })
                   : onSave({
                       name: name,
-                      instructions: instruction,
-                      tools: [],
+                      assistant_id: tutor.id,
                     })
               }
             >

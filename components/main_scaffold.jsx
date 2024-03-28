@@ -69,7 +69,6 @@ export default function MainScaffold({ children }) {
 
       {/* mobile navigation */}
       <MobileNav onOpen={onOpen} />
-      {/* <MobileNav display={{ base: 'flex', md: 'none' }} onOpen={onOpen} /> */}
 
       {/* children */}
       <Box ml={{ base: 0, md: 60 }} p='4'>

@@ -9,6 +9,18 @@ import { ErrorBoundary } from 'next/dist/client/components/error-boundary';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Error from '../error';
+import {
+  AlertDialog,
+  Button,
+  Container,
+  Dialog,
+  Flex,
+  IconButton,
+  Text,
+} from '@radix-ui/themes';
+import PtTutorModal from '@/components/pt_tutor_modal';
+import { FiEdit, FiPlus, FiTrash } from 'react-icons/fi';
+import PtAlertDialog from '@/components/pt_alert_dialog';
 
 export default function TutorsPage() {
   const [data, setData] = useState(null);
@@ -21,6 +33,8 @@ export default function TutorsPage() {
 
   const auth = getAuth(firebase_app);
   const user = auth.currentUser;
+
+  const url = 'http://127.0.0.1:8000/';
 
   useEffect(() => {
     fetchTutors();
@@ -35,9 +49,7 @@ export default function TutorsPage() {
       try {
         const query = { token: idToken };
         const queryString = new URLSearchParams(query).toString();
-        const res = await fetch(
-          `http://127.0.0.1:8000/v1/tutors?${queryString}`
-        );
+        const res = await fetch(`${url}v1/tutors?${queryString}`);
         if (!res.ok) {
           throw new Error('Failed to fetch data');
         }
@@ -60,16 +72,13 @@ export default function TutorsPage() {
       const idToken = await user.getIdToken();
       const query = { token: idToken };
       const queryString = new URLSearchParams(query).toString();
-      const res = await fetch(
-        `http://127.0.0.1:8000/v1/tutors?${queryString}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(createData),
-        }
-      );
+      const res = await fetch(`${url}v1/tutors?${queryString}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(createData),
+      });
       if (!res.ok) {
         throw new Error('Failed to create personal tutor');
       }
@@ -88,16 +97,13 @@ export default function TutorsPage() {
       const idToken = await user.getIdToken();
       const query = { token: idToken };
       const queryString = new URLSearchParams(query).toString();
-      const res = await fetch(
-        `http://127.0.0.1:8000/v1/tutors/${assistantId}?${queryString}`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(updatedData),
-        }
-      );
+      const res = await fetch(`${url}v1/tutors/${assistantId}?${queryString}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedData),
+      });
       if (!res.ok) {
         throw new Error('Failed to update personal tutor');
       }
@@ -116,15 +122,12 @@ export default function TutorsPage() {
       const idToken = await user.getIdToken();
       const query = { token: idToken };
       const queryString = new URLSearchParams(query).toString();
-      const res = await fetch(
-        `http://127.0.0.1:8000/v1/tutors/${assistantId}?${queryString}`,
-        {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      const res = await fetch(`${url}v1/tutors/${assistantId}?${queryString}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
       if (!res.ok) {
         throw new Error('Failed to delete personal tutor');
       }
@@ -146,16 +149,109 @@ export default function TutorsPage() {
     });
   };
 
+  const columns = [
+    {
+      header: 'Name',
+      render: (item) => <Text>{item.name}</Text>,
+    },
+    {
+      header: 'Model',
+      render: (item) => <Text>{item.model}</Text>,
+    },
+    {
+      header: 'Instruction',
+      render: (item) => <Text>{item.instructions}</Text>,
+    },
+    {
+      header: 'Created',
+      render: (item) => (
+        <Text>
+          {new Date(item.created_at * 1000).toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+          })}
+        </Text>
+      ),
+    },
+    {
+      header: 'Actions',
+      render: (item) => <Flex gap='3'>{renderRowActions(item)}</Flex>,
+    },
+  ];
+
+  const renderRowActions = (item) => (
+    <>
+      <PtTutorModal
+        title={'Edit Personal Tutor'}
+        subtitle={'Personal tutor details'}
+        item={item}
+        onSave={updateTutor}
+      >
+        <Dialog.Trigger>
+          <IconButton variant='soft'>
+            <FiEdit />
+          </IconButton>
+        </Dialog.Trigger>
+      </PtTutorModal>
+
+      <PtAlertDialog
+        title={'Delete Personal Tutor'}
+        description={
+          <>
+            Are you sure you want to delete <strong>{item.name}</strong>? This
+            action cannot be undone.
+          </>
+        }
+        buttonTitle={'Delete'}
+        onSubmit={() => deleteTutor(item.id)}
+      >
+        <AlertDialog.Trigger>
+          <IconButton variant='soft' color='red'>
+            <FiTrash />
+          </IconButton>
+        </AlertDialog.Trigger>
+      </PtAlertDialog>
+    </>
+  );
+
   return (
     <ErrorBoundary FallbackComponent={<Error />}>
-      <PtTable
-        data={data}
-        isLoading={isLoading}
-        error={error}
-        onCreate={createTutor}
-        onUpdate={updateTutor}
-        onDelete={deleteTutor}
-      />
+      <Container>
+        {/* create modal */}
+        <PtTutorModal
+          title={`Create Tutor`}
+          subtitle={`Tutor details`}
+          onSave={createTutor}
+        >
+          <Flex justify='between'>
+            {/* title */}
+            <Flex direction='column'>
+              <Text size='4' as='b'>
+                Tutors
+              </Text>
+              <Text color='gray' size='2'>
+                Your Personal Tutors
+              </Text>
+            </Flex>
+
+            {/* dialog cta */}
+            <Dialog.Trigger>
+              <Button>
+                <FiPlus width='16' height='16' /> Create
+              </Button>
+            </Dialog.Trigger>
+          </Flex>
+        </PtTutorModal>
+
+        <PtTable
+          data={data}
+          isLoading={isLoading}
+          error={error}
+          columns={columns}
+          renderRowActions={renderRowActions}
+        />
+      </Container>
     </ErrorBoundary>
   );
 }
