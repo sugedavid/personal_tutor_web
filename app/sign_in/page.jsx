@@ -87,8 +87,8 @@ export default function SignInPage() {
         </Stack>
 
         <Box rounded={'lg'} bg={'white'} boxShadow={'lg'} p={8}>
-          <form onSubmit={handleSubmit(handleForm)}>
-            <Stack spacing={4}>
+          <Stack spacing={4}>
+            <form onSubmit={handleSubmit(handleForm)}>
               {/* email */}
               <FormControl
                 id='email'
@@ -157,18 +157,18 @@ export default function SignInPage() {
                   )}
                 </Button>
               </Stack>
+            </form>
 
-              {/* new user */}
-              <Stack pt={6}>
-                <Text align={'center'}>
-                  Don&apos;t have an account?{' '}
-                  <Link href='/sign_up' color={'blue.400'}>
-                    Register
-                  </Link>
-                </Text>
-              </Stack>
+            {/* new user */}
+            <Stack pt={6}>
+              <Text align={'center'}>
+                Don&apos;t have an account?{' '}
+                <Link href='/sign_up' color={'blue.400'}>
+                  Register
+                </Link>
+              </Text>
             </Stack>
-          </form>
+          </Stack>
         </Box>
       </Stack>
     </Flex>

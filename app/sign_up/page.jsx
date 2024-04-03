@@ -25,8 +25,17 @@ import { useForm } from 'react-hook-form';
 export default function SignUpPage() {
   const router = useRouter();
   const toast = useToast();
+
+  const [firstName, setFirstName] = React.useState('');
+  const [lastName, setLastName] = React.useState('');
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+
   const [showPassword, setShowPassword] = React.useState(false);
-  const [isSignUp, setSignUp] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState(null);
+
+  const url = 'http://127.0.0.1:8000/';
 
   const {
     register,
@@ -34,16 +43,51 @@ export default function SignUpPage() {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = ({ email, password }) => {
-    setSignUp(true);
+  // register user
+  const handleForm = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`${url}v1/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          first_name: firstName,
+          last_name: lastName,
+          email: email,
+          password: password,
+        }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data?.detail ?? 'Registration failed');
+      }
+      setLoading(false);
+      toastMessage(
+        'Registered successfully',
+        'Sign in with your new account',
+        'success'
+      );
+      router.push('/sign_in');
+    } catch (err) {
+      setLoading(false);
+      toastMessage('Registration failed', err?.message, 'error');
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toastMessage = (title, description, status) => {
     toast({
-      title: 'Registered successfully.',
-      status: 'success',
+      title: title,
+      description: description,
+      status: status,
       duration: 3000,
       isClosable: true,
     });
-    router.push('/dashboard');
-    setSignUp(false);
   };
 
   return (
@@ -67,84 +111,123 @@ export default function SignUpPage() {
           p={8}
         >
           <Stack spacing={4}>
-            <HStack>
-              {/* first name */}
-              <Box>
-                <FormControl id='firstName' isRequired>
-                  <FormLabel>First Name</FormLabel>
-                  <Input type='text' />
-                </FormControl>
-              </Box>
+            <form onSubmit={handleSubmit(handleForm)}>
+              <HStack>
+                {/* first name */}
+                <Box>
+                  <FormControl
+                    id='firstName'
+                    isRequired
+                    isInvalid={errors?.firstName}
+                  >
+                    <FormLabel>First Name</FormLabel>
+                    <Input
+                      type='text'
+                      name='firstName'
+                      {...register('firstName', {
+                        required: true,
+                      })}
+                      onChange={(e) => setFirstName(e.target.value)}
+                    />
+                  </FormControl>
+                  <FormErrorMessage>
+                    {errors?.firstName?.message}
+                  </FormErrorMessage>
+                </Box>
 
-              {/* last name */}
-              <Box>
-                <FormControl id='lastName'>
-                  <FormLabel>Last Name</FormLabel>
-                  <Input type='text' />
-                </FormControl>
-              </Box>
-            </HStack>
+                {/* last name */}
+                <Box>
+                  <FormControl
+                    id='lastName'
+                    isRequired
+                    isInvalid={errors?.lastName}
+                  >
+                    <FormLabel>Last Name</FormLabel>
+                    <Input
+                      type='text'
+                      name='lastName'
+                      {...register('lastName', {
+                        required: true,
+                      })}
+                      onChange={(e) => setLastName(e.target.value)}
+                    />
+                  </FormControl>
+                  <FormErrorMessage>
+                    {errors?.lastName?.message}
+                  </FormErrorMessage>
+                </Box>
+              </HStack>
 
-            {/* email */}
-            <FormControl id='email' isRequired isInvalid={errors?.email}>
-              <FormLabel>Email address</FormLabel>
-              <Input
-                type='email'
-                name='email'
-                {...register('email', {
-                  required: true,
-                  pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
-                    message: 'Invalid email address',
-                  },
-                })}
-              />
-              <FormErrorMessage>{errors?.email?.message}</FormErrorMessage>
-            </FormControl>
-
-            {/* password */}
-            <FormControl id='password' isRequired isInvalid={errors?.password}>
-              <FormLabel>Password</FormLabel>
-              <InputGroup>
+              {/* email */}
+              <FormControl
+                id='email'
+                isRequired
+                isInvalid={errors?.email}
+                w={400}
+              >
+                <FormLabel>Email address</FormLabel>
                 <Input
-                  type={showPassword ? 'text' : 'password'}
-                  name='password'
-                  {...register('password', {
+                  type='email'
+                  name='email'
+                  {...register('email', {
                     required: true,
-                    minLength: {
-                      value: 6,
-                      message: 'Password must be at least 6 characters long',
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+                      message: 'Invalid email address',
                     },
                   })}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
-                <InputRightElement h={'full'}>
-                  <IconButton
-                    variant={'ghost'}
-                    onClick={() =>
-                      setShowPassword((showPassword) => !showPassword)
-                    }
-                  >
-                    {showPassword ? <ViewIcon /> : <ViewOffIcon />}
-                  </IconButton>
-                </InputRightElement>
-              </InputGroup>
-              <FormErrorMessage>{errors?.password?.message}</FormErrorMessage>
-            </FormControl>
+                <FormErrorMessage>{errors?.email?.message}</FormErrorMessage>
+              </FormControl>
 
-            {/* sign up */}
-            <Stack spacing={10} pt={2}>
-              <Button
-                size='3'
-                onClick={handleSubmit(onSubmit)}
-                disabled={isSignUp}
+              {/* password */}
+              <FormControl
+                id='password'
+                isRequired
+                isInvalid={errors?.password}
+                w={400}
               >
-                {isSignUp ? (
-                  <Spinner color='purple.600' loading={false} />
-                ) : (
-                  'Continue'
-                )}
-              </Button>
-            </Stack>
+                <FormLabel>Password</FormLabel>
+
+                <InputGroup>
+                  <Input
+                    type={showPassword ? 'text' : 'password'}
+                    name='password'
+                    {...register('password', {
+                      required: true,
+                      minLength: {
+                        value: 6,
+                        message: 'Password must be at least 6 characters long',
+                      },
+                    })}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <InputRightElement h={'full'}>
+                    <IconButton
+                      variant='ghost'
+                      onClick={() =>
+                        setShowPassword((showPassword) => !showPassword)
+                      }
+                    >
+                      {showPassword ? <ViewIcon /> : <ViewOffIcon />}
+                    </IconButton>
+                  </InputRightElement>
+                </InputGroup>
+                <FormErrorMessage>{errors?.password?.message}</FormErrorMessage>
+              </FormControl>
+
+              {/* sign up */}
+              <Stack spacing={10} pt={2}>
+                <Button size='3' disabled={loading}>
+                  {loading ? (
+                    <Spinner color='purple.600' loading={false} />
+                  ) : (
+                    'Continue'
+                  )}
+                </Button>
+              </Stack>
+            </form>
 
             {/* already a user */}
             <Stack pt={6}>
