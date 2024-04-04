@@ -2,5 +2,5 @@
 'use client';
 
 export default function SettingsPage() {
-  return <nav>Settings</nav>;
+  return <nav>Usage</nav>;
 }

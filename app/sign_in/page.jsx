@@ -149,7 +149,7 @@ export default function SignInPage() {
               </FormControl>
               {/* sign in cta */}
               <Stack spacing={10} pt={2}>
-                <Button type='submit' size={'3'} disabled={isSignIn}>
+                <Button size={'3'} disabled={isSignIn}>
                   {isSignIn ? (
                     <Spinner color='purple.600' loading={false} />
                   ) : (

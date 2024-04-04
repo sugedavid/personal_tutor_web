@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Avatar,
   Box,
@@ -22,13 +24,12 @@ import {
 import { AlertDialog, Badge } from '@radix-ui/themes';
 import { useRouter } from 'next/navigation';
 import {
-  FiBell,
   FiBook,
   FiChevronDown,
   FiLogOut,
   FiMenu,
   FiMessageSquare,
-  FiSettings,
+  FiPieChart,
   FiUser,
 } from 'react-icons/fi';
 import PtAlertDialog from './pt_alert_dialog';
@@ -36,11 +37,14 @@ import PtAlertDialog from './pt_alert_dialog';
 import firebase_app from '@/firebase';
 import { getAuth, signOut } from 'firebase/auth';
 
+import { useAppSelector, useAppDispatch } from '../lib/hooks';
+import { setIndex } from '../lib/slices/mainScaffoldSlice';
+
 const NavigationItems = [
   { name: 'Chats', icon: FiMessageSquare, path: '/dashboard/chats' },
   { name: 'Tutors', icon: FiUser, path: '/dashboard/tutors' },
   { name: 'Modules', icon: FiBook, path: '/dashboard/modules' },
-  { name: 'Settings', icon: FiSettings, path: '/dashboard/settings' },
+  { name: 'Usage', icon: FiPieChart, path: '/dashboard/usage' },
   { name: 'Sign out', icon: FiLogOut, path: '/sign_in' },
 ];
 
@@ -85,10 +89,13 @@ const SidebarContent = ({ onClose, ...rest }) => {
 
   const auth = getAuth(firebase_app);
 
-  const handleNavigation = (path) => {
+  const dispatch = useAppDispatch();
+
+  const handleNavigation = (path, index) => {
     if (path === '/sign_in') {
       signOut(auth)
         .then(() => {
+          dispatch(setIndex(0));
           toast({
             title: 'Signed out successfully.',
             status: 'success',
@@ -107,6 +114,7 @@ const SidebarContent = ({ onClose, ...rest }) => {
           });
         });
     } else {
+      dispatch(setIndex(index));
       router.push(path);
     }
   };
@@ -123,21 +131,22 @@ const SidebarContent = ({ onClose, ...rest }) => {
     >
       {/* logo */}
       <Flex h='20' alignItems='center' mx='8' justifyContent='space-between'>
-        <Text fontSize='xl' fontWeight='bold'>
+        <Text fontSize='l' fontWeight='bold'>
           Personal Tutor
         </Text>
         <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
       </Flex>
 
       {/* nav items */}
-      {NavigationItems.map((link) => (
+      {NavigationItems.map((link, index) => (
         <NavItem
           key={link.name}
           icon={link.icon}
           path={link.path}
-          onClick={() => handleNavigation(link.path)}
+          index={index}
+          onClick={() => handleNavigation(link.path, index)}
         >
-          {link.name}
+          <Text fontSize={'sm'}>{link.name}</Text>
         </NavItem>
       ))}
     </Box>
@@ -145,7 +154,8 @@ const SidebarContent = ({ onClose, ...rest }) => {
 };
 
 // navigation item component
-const NavItem = ({ icon, onClick, path, children, ...rest }) => {
+const NavItem = ({ icon, onClick, path, index, children, ...rest }) => {
+  const stateIndex = useAppSelector((state) => state.index.value);
   return (
     <>
       {path === '/sign_in' ? (
@@ -159,16 +169,15 @@ const NavItem = ({ icon, onClick, path, children, ...rest }) => {
             <Box>
               <Flex
                 align='center'
-                p='4'
+                p='3'
                 mx='4'
                 borderRadius='lg'
                 role='group'
                 cursor='pointer'
                 _hover={{
-                  bg: 'blue.500',
+                  bg: 'purple.500',
                   color: 'white',
                 }}
-                // onClick={onClick}
                 {...rest}
               >
                 {icon && (
@@ -196,13 +205,17 @@ const NavItem = ({ icon, onClick, path, children, ...rest }) => {
         >
           <Flex
             align='center'
-            p='4'
+            p='3'
             mx='4'
             borderRadius='lg'
             role='group'
             cursor='pointer'
+            mt={0.5}
+            mb={0.5}
+            bg={stateIndex === index ? 'purple.500' : 'transparent'}
+            color={stateIndex === index ? 'white' : 'black'}
             _hover={{
-              bg: 'blue.500',
+              bg: 'purple.500',
               color: 'white',
             }}
             {...rest}
@@ -260,47 +273,23 @@ const MobileNav = ({ onOpen, ...rest }) => {
       </Text>
 
       <HStack spacing={{ base: '0', md: '6' }}>
-        <IconButton
-          size='lg'
-          variant='ghost'
-          aria-label='open menu'
-          icon={<FiBell />}
-        />
         <Flex alignItems={'center'}>
-          <Menu>
-            <MenuButton
-              py={2}
-              transition='all 0.3s'
-              _focus={{ boxShadow: 'none' }}
+          <HStack>
+            <Avatar size='sm' name={user?.displayName ?? 'No Name'} />
+            <VStack
+              display={{ base: 'none', md: 'flex' }}
+              alignItems='flex-start'
+              spacing='1px'
+              ml='2'
             >
-              <HStack>
-                <Avatar size='sm' name={user?.displayName ?? 'No Name'} />
-                <VStack
-                  display={{ base: 'none', md: 'flex' }}
-                  alignItems='flex-start'
-                  spacing='1px'
-                  ml='2'
-                >
-                  <Text fontSize='sm'>{user?.displayName ?? 'No name'}</Text>
-                  <Badge variant='surface' color='orange'>
-                    {user?.email}
-                  </Badge>
-                </VStack>
-                <Box display={{ base: 'none', md: 'flex' }}>
-                  <FiChevronDown />
-                </Box>
-              </HStack>
-            </MenuButton>
-            <MenuList
-              bg={'white'}
-              borderColor={useColorModeValue('gray.200', 'gray.700')}
-            >
-              <MenuItem>Profile</MenuItem>
-              <MenuItem>Usage</MenuItem>
-              <MenuDivider />
-              <MenuItem color={'red.500'}>Sign out</MenuItem>
-            </MenuList>
-          </Menu>
+              <Text fontSize='sm' fontWeight='bold'>
+                {user?.displayName ?? 'No name'}
+              </Text>
+              <Badge size={'1'} variant='surface'>
+                {user?.email}
+              </Badge>
+            </VStack>
+          </HStack>
         </Flex>
       </HStack>
     </Flex>

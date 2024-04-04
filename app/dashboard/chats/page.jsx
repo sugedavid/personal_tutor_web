@@ -236,21 +236,24 @@ export default function ChatsPage() {
               // messages
               <VStack spacing={4} align='flex-start' p={4}>
                 {messages?.map((message) => (
-                  <Flex key={message.id} gap='3' align='top' mb={2}>
+                  <Flex key={message.id} gap='3' align='top' mb={2} w='100%'>
                     <Avatar
                       size='sm'
                       name={
-                        message?.role === 'user' ? 'John Doe' : module?.name
+                        message?.role === 'user'
+                          ? user?.displayName ?? 'No Name'
+                          : module?.name
                       }
                     />
-                    <Box>
+                    <Box w='100%'>
                       <Text as='div' size='2' weight='bold'>
-                        {message?.role === 'user' ? 'John Doe' : module?.name}
+                        {message?.role === 'user' ? 'You' : module?.name}
                       </Text>
                       <Text as='div' size='2' color='gray'>
                         {message?.content?.[0].text?.value}
                       </Text>
-                      <Text as='div' size='1' color='gray'>
+                      <Box h={2} />
+                      <Text align={'right'} as='div' size='1' color='gray'>
                         {new Date(
                           message?.created_at * 1000
                         ).toLocaleDateString('en-GB', {
