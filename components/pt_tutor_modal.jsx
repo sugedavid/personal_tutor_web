@@ -1,4 +1,5 @@
 // components/pt_modal.jsx
+'use client';
 
 import {
   Button,

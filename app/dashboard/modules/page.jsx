@@ -8,7 +8,7 @@ import { getAuth } from 'firebase/auth';
 import { ErrorBoundary } from 'next/dist/client/components/error-boundary';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import Error from '../error';
+import ErrorScaffold from '../error';
 import {
   AlertDialog,
   Button,
@@ -21,13 +21,13 @@ import {
 import PtModuleModal from '@/components/pt_module_modal';
 import { FiEdit, FiPlus, FiTrash } from 'react-icons/fi';
 import PtAlertDialog from '@/components/pt_alert_dialog';
+import { toastMessage } from '@/components/pt_toast';
 
 export default function ModulesPage() {
   const [data, setData] = useState(null);
   const [tutors, setTutors] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [updateError, setUpdateError] = useState(null);
 
   const router = useRouter();
   const toast = useToast();
@@ -52,14 +52,14 @@ export default function ModulesPage() {
         const query = { token: idToken };
         const queryString = new URLSearchParams(query).toString();
         const res = await fetch(`${url}v1/tutors?${queryString}`);
+        const data = await res.json();
         if (!res.ok) {
-          throw new Error('Failed to fetch data');
+          throw new Error(data?.detail ?? 'Failed to fetch tutors');
         }
 
-        const data = await res.json();
         setTutors(data.data);
       } catch (err) {
-        setError(err);
+        setError(err?.message);
       } finally {
         setIsLoading(false);
       }
@@ -77,14 +77,14 @@ export default function ModulesPage() {
         const query = { token: idToken };
         const queryString = new URLSearchParams(query).toString();
         const res = await fetch(`${url}v1/modules?${queryString}`);
+        const data = await res.json();
         if (!res.ok) {
-          throw new Error('Failed to fetch data');
+          throw new Error(data?.detail ?? 'Failed to fetch data');
         }
 
-        const data = await res.json();
         setData(data);
       } catch (err) {
-        setError(err);
+        setError(err?.message);
       } finally {
         setIsLoading(false);
       }
@@ -106,15 +106,16 @@ export default function ModulesPage() {
         },
         body: JSON.stringify(createData),
       });
+      const data = await res.json();
       if (!res.ok) {
-        throw new Error('Failed to create module');
+        throw new Error(data?.detail);
       }
       // If successful, refetch the data to reflect the changes
-      toastMessage('Module create successfully', 'success');
+      toastMessage(toast, 'Module create successfully', null, 'success');
       fetchModules();
     } catch (err) {
-      toastMessage('Failed to create module', 'error');
-      setUpdateError(err);
+      toastMessage(toast, 'Failed to create module', err?.message, 'error');
+      setError(err?.message);
     }
   };
 
@@ -134,15 +135,16 @@ export default function ModulesPage() {
           body: JSON.stringify(updatedData),
         }
       );
+      const data = await res.json();
       if (!res.ok) {
-        throw new Error('Failed to update module');
+        throw new Error(data?.detail);
       }
       // If successful, refetch the data to reflect the changes
-      toastMessage('Module updated successfully', 'success');
+      toastMessage(toast, 'Module updated successfully', null, 'success');
       fetchModules();
     } catch (err) {
-      toastMessage('Failed to update module', 'error');
-      setUpdateError(err);
+      toastMessage(toast, 'Failed to update module', err?.message, 'error');
+      setError(err?.message);
     }
   };
 
@@ -161,25 +163,17 @@ export default function ModulesPage() {
           },
         }
       );
+      const data = await res.json();
       if (!res.ok) {
-        throw new Error('Failed to delete module');
+        throw new Error(data?.detail);
       }
       // If successful, refetch the data to reflect the changes
-      toastMessage('Module deleted successfully', 'success');
+      toastMessage(toast, 'Module deleted successfully', null, 'success');
       fetchModules();
     } catch (err) {
-      toastMessage('Failed to delete module', 'error');
-      setUpdateError(err);
+      toastMessage(toast, 'Failed to delete module', err?.message, 'error');
+      setError(err?.message);
     }
-  };
-
-  const toastMessage = (title, status) => {
-    toast({
-      title: title,
-      status: status,
-      duration: 3000,
-      isClosable: true,
-    });
   };
 
   const columns = [
@@ -246,7 +240,7 @@ export default function ModulesPage() {
   );
 
   return (
-    <ErrorBoundary FallbackComponent={<Error />}>
+    <ErrorBoundary FallbackComponent={<ErrorScaffold error={error} />}>
       <Container>
         {/* create modal */}
         <PtModuleModal
@@ -279,6 +273,7 @@ export default function ModulesPage() {
           data={data}
           isLoading={isLoading}
           error={error}
+          reset={fetchModules}
           columns={columns}
           renderRowActions={renderRowActions}
         />

@@ -21,6 +21,8 @@ import { getAuth } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { FiChevronDown, FiSend } from 'react-icons/fi';
+import ErrorScaffold from '../error';
+import { toastMessage } from '@/components/pt_toast';
 
 export default function ChatsPage() {
   const [messages, setMessages] = useState(null);
@@ -45,7 +47,6 @@ export default function ChatsPage() {
 
   useEffect(() => {
     fetchModules();
-    scrollToBottom();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -58,16 +59,16 @@ export default function ChatsPage() {
         const query = { token: idToken };
         const queryString = new URLSearchParams(query).toString();
         const res = await fetch(`${url}v1/modules?${queryString}`);
+        const data = await res.json();
         if (!res.ok) {
-          throw new Error('Failed to fetch data');
+          throw new Error(data?.detail ?? 'Failed to fetch modules');
         }
 
-        const data = await res.json();
         setModules(data);
         setModule(data[0]);
         fetchMessages(data?.[0]);
       } catch (err) {
-        setError(err);
+        setError(err?.message);
       } finally {
         setIsLoading(false);
       }
@@ -88,14 +89,14 @@ export default function ChatsPage() {
         };
         const queryString = new URLSearchParams(query).toString();
         const res = await fetch(`${url}v1/messages?${queryString}`);
+        const data = await res.json();
         if (!res.ok) {
-          throw new Error('Failed to fetch data');
+          throw new Error(data?.detail ?? 'Failed to fetch messages');
         }
 
-        const data = await res.json();
         setMessages(data?.data?.reverse());
       } catch (err) {
-        setError(err);
+        setError(err?.message);
       } finally {
         setIsLoading(false);
         scrollToBottom();
@@ -128,16 +129,16 @@ export default function ChatsPage() {
         },
         body: JSON.stringify(newMessage),
       });
+      const data = await res.json();
       if (!res.ok) {
-        throw new Error('Failed to send message');
+        throw new Error(data?.detail);
       }
       // If successful, refetch the data to reflect the changes
       setMessageInput('');
-      scrollToBottom();
       delayedFetch();
     } catch (err) {
-      toastMessage('Failed to send message', 'error');
-      setUpdateError(err);
+      toastMessage(toast, 'Failed to send message', err?.message, 'error');
+      setError(err?.message);
     }
   };
 
@@ -170,6 +171,15 @@ export default function ChatsPage() {
   // loading
   if (isLoading) {
     return <Progress size='xs' isIndeterminate color='violet' />;
+  }
+
+  // error
+  if (error) {
+    return (
+      <Flex h='40vh' style={{ justifyContent: 'center', alignItems: 'center' }}>
+        <ErrorScaffold error={error} reset={fetchModules} />;
+      </Flex>
+    );
   }
 
   // empty state
@@ -305,7 +315,7 @@ export default function ChatsPage() {
               <DropdownMenu.Root>
                 <DropdownMenu.Trigger>
                   <Button variant='soft' size={'1'}>
-                    {!module ? 'Select tutor' : module?.assistant?.name}
+                    {!module ? 'Select module' : module?.name}
                     <FiChevronDown />
                   </Button>
                 </DropdownMenu.Trigger>
@@ -313,9 +323,12 @@ export default function ChatsPage() {
                   {modules?.map((item) => (
                     <DropdownMenu.Item
                       key={item.id}
-                      onSelect={() => setModule(item?.assistant)}
+                      onSelect={() => {
+                        setModule(item);
+                        fetchMessages(item);
+                      }}
                     >
-                      {item.assistant?.name}
+                      {item.name}
                     </DropdownMenu.Item>
                   ))}
                 </DropdownMenu.Content>
