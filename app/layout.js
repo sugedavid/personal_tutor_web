@@ -1,10 +1,10 @@
+import { Theme } from '@radix-ui/themes';
+import '@radix-ui/themes/styles.css';
 import { Inter } from 'next/font/google';
+import { fonts } from './fonts';
 import './globals.css';
 import { Providers } from './providers';
-import { fonts } from './fonts';
-import { Theme, ThemePanel } from '@radix-ui/themes';
-import { ThemeProvider } from 'next-themes';
-import '@radix-ui/themes/styles.css';
+import StoreProvider from './StoreProvider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -18,7 +18,9 @@ export default function RootLayout({ children }) {
     <html lang='en' className={fonts.rubik.variable}>
       <body className={inter.className}>
         <Theme accentColor='violet'>
-          <Providers>{children}</Providers>
+          <StoreProvider index={0}>
+            <Providers>{children}</Providers>
+          </StoreProvider>
         </Theme>
       </body>
     </html>
