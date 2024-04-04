@@ -1,13 +1,9 @@
 'use client';
 
 import { Box, Button, Flex, Text } from '@radix-ui/themes';
-import { useEffect } from 'react';
 
-export default function Error({ error, reset }) {
-  useEffect(() => {
-    // Log the error to an error reporting service
-    console.error(error);
-  }, [error]);
+export default function ErrorScaffold({ error, reset }) {
+  console.log(error);
 
   return (
     <Flex
@@ -19,17 +15,10 @@ export default function Error({ error, reset }) {
         Something went wrong!
       </Text>
       <Text align='center' color='gray'>
-        We&apos;re sorry, something went wrong. Please try again later.
+        {error}
       </Text>
       <Box mt='3' size='3' align='center'>
-        <Button
-          onClick={
-            // Attempt to recover by trying to re-render the segment
-            () => reset()
-          }
-        >
-          Try again
-        </Button>
+        <Button onClick={() => reset()}>Try again</Button>
       </Box>
     </Flex>
   );

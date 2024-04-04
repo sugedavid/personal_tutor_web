@@ -1,3 +1,5 @@
+'use client';
+
 import { AlertDialog, Button, Flex } from '@radix-ui/themes';
 
 export default function PtAlertDialog({

@@ -1,11 +1,22 @@
 // app/components/pt_table.jsx
+'use client';
+
+import ErrorScaffold from '@/app/dashboard/error';
 import { Progress } from '@chakra-ui/react';
 import { Container, Flex, Table, Text } from '@radix-ui/themes';
 
-export default function PtTable({ data, isLoading, error, columns }) {
+export default function PtTable({ data, isLoading, error, reset, columns }) {
   if (isLoading) {
     return <Progress size='xs' isIndeterminate color='violet' />;
   }
+
+  // sort data
+  data?.sort((a, b) => {
+    const timeA = new Date(a.created_at);
+    const timeB = new Date(b.created_at);
+
+    return timeB - timeA;
+  });
 
   return (
     <Container ml='10' mr='10' mt='4'>
@@ -28,16 +39,14 @@ export default function PtTable({ data, isLoading, error, columns }) {
             error ? (
               <Table.Row>
                 <Table.Cell colSpan={5} align='center'>
-                  <Text align='center'>
-                    Something went wrong. Please try again later.
-                  </Text>
+                  <ErrorScaffold error={error} reset={reset} />
                 </Table.Cell>
               </Table.Row>
             ) : // Check if data is empty
 
             !data || data?.length === 0 ? (
               <Table.Row>
-                <Table.Cell colSpan={2}>
+                <Table.Cell colSpan={5}>
                   <Text align='center'>No data available</Text>
                 </Table.Cell>
               </Table.Row>

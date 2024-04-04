@@ -8,7 +8,7 @@ import { getAuth } from 'firebase/auth';
 import { ErrorBoundary } from 'next/dist/client/components/error-boundary';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import Error from '../error';
+import ErrorScaffold from '../error';
 import {
   AlertDialog,
   Button,
@@ -21,12 +21,12 @@ import {
 import PtTutorModal from '@/components/pt_tutor_modal';
 import { FiEdit, FiPlus, FiTrash } from 'react-icons/fi';
 import PtAlertDialog from '@/components/pt_alert_dialog';
+import { toastMessage } from '@/components/pt_toast';
 
 export default function TutorsPage() {
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [updateError, setUpdateError] = useState(null);
 
   const router = useRouter();
   const toast = useToast();
@@ -50,14 +50,14 @@ export default function TutorsPage() {
         const query = { token: idToken };
         const queryString = new URLSearchParams(query).toString();
         const res = await fetch(`${url}v1/tutors?${queryString}`);
+        const data = await res.json();
         if (!res.ok) {
-          throw new Error('Failed to fetch data');
+          throw new Error(data?.detail ?? 'Failed to fets personal tutors');
         }
 
-        const data = await res.json();
         setData(data.data);
       } catch (err) {
-        setError(err);
+        setError(err?.message);
       } finally {
         setIsLoading(false);
       }
@@ -79,15 +79,26 @@ export default function TutorsPage() {
         },
         body: JSON.stringify(createData),
       });
+      const data = await res.json();
       if (!res.ok) {
-        throw new Error('Failed to create personal tutor');
+        throw new Error(data?.detail);
       }
       // If successful, refetch the data to reflect the changes
-      toastMessage('Personal tutor create successfully', 'success');
+      toastMessage(
+        toast,
+        'Personal tutor create successfully',
+        null,
+        'success'
+      );
       fetchTutors();
     } catch (err) {
-      toastMessage('Failed to create personal tutor', 'error');
-      setUpdateError(err);
+      toastMessage(
+        toast,
+        'Failed to create personal tutor',
+        err?.message,
+        'error'
+      );
+      setError(err?.message);
     }
   };
 
@@ -104,15 +115,26 @@ export default function TutorsPage() {
         },
         body: JSON.stringify(updatedData),
       });
+      const data = await res.json();
       if (!res.ok) {
-        throw new Error('Failed to update personal tutor');
+        throw new Error(data?.detail);
       }
       // If successful, refetch the data to reflect the changes
-      toastMessage('Personal tutor updated successfully', 'success');
+      toastMessage(
+        toast,
+        'Personal tutor updated successfully',
+        null,
+        'success'
+      );
       fetchTutors();
     } catch (err) {
-      toastMessage('Failed to update personal tutor', 'error');
-      setUpdateError(err);
+      toastMessage(
+        toast,
+        'Failed to update personal tutor',
+        err?.message,
+        'error'
+      );
+      setError(err?.message);
     }
   };
 
@@ -128,25 +150,27 @@ export default function TutorsPage() {
           'Content-Type': 'application/json',
         },
       });
+      const data = await res.json();
       if (!res.ok) {
-        throw new Error('Failed to delete personal tutor');
+        throw new Error(data?.detail);
       }
       // If successful, refetch the data to reflect the changes
-      toastMessage('Personal tutor deleted successfully', 'success');
+      toastMessage(
+        toast,
+        'Personal tutor deleted successfully',
+        null,
+        'success'
+      );
       fetchTutors();
     } catch (err) {
-      toastMessage('Failed to delete personal tutor', 'error');
-      setUpdateError(err);
+      toastMessage(
+        toast,
+        'Failed to delete personal tutor',
+        err?.message,
+        'error'
+      );
+      setError(err?.message);
     }
-  };
-
-  const toastMessage = (title, status) => {
-    toast({
-      title: title,
-      status: status,
-      duration: 3000,
-      isClosable: true,
-    });
   };
 
   const columns = [
@@ -216,7 +240,7 @@ export default function TutorsPage() {
   );
 
   return (
-    <ErrorBoundary FallbackComponent={<Error />}>
+    <ErrorBoundary FallbackComponent={<ErrorScaffold error={error} />}>
       <Container>
         {/* create modal */}
         <PtTutorModal
@@ -249,6 +273,7 @@ export default function TutorsPage() {
           isLoading={isLoading}
           error={error}
           columns={columns}
+          reset={fetchTutors}
           renderRowActions={renderRowActions}
         />
       </Container>

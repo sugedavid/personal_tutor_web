@@ -1,5 +1,6 @@
 'use client';
 
+import toastMessage from '@/components/pt_toast';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import {
   Box,
@@ -66,6 +67,7 @@ export default function SignUpPage() {
       }
       setLoading(false);
       toastMessage(
+        toast,
         'Registered successfully',
         'Sign in with your new account',
         'success'
@@ -73,21 +75,11 @@ export default function SignUpPage() {
       router.push('/sign_in');
     } catch (err) {
       setLoading(false);
-      toastMessage('Registration failed', err?.message, 'error');
-      setError(err);
+      toastMessage(toast, 'Registration failed', err?.message, 'error');
+      setError(err?.message);
     } finally {
       setLoading(false);
     }
-  };
-
-  const toastMessage = (title, description, status) => {
-    toast({
-      title: title,
-      description: description,
-      status: status,
-      duration: 3000,
-      isClosable: true,
-    });
   };
 
   return (

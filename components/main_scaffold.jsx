@@ -10,11 +10,6 @@ import {
   HStack,
   Icon,
   IconButton,
-  Menu,
-  MenuButton,
-  MenuDivider,
-  MenuItem,
-  MenuList,
   Text,
   VStack,
   useColorModeValue,
@@ -25,7 +20,6 @@ import { AlertDialog, Badge } from '@radix-ui/themes';
 import { useRouter } from 'next/navigation';
 import {
   FiBook,
-  FiChevronDown,
   FiLogOut,
   FiMenu,
   FiMessageSquare,
@@ -37,7 +31,7 @@ import PtAlertDialog from './pt_alert_dialog';
 import firebase_app from '@/firebase';
 import { getAuth, signOut } from 'firebase/auth';
 
-import { useAppSelector, useAppDispatch } from '../lib/hooks';
+import { useAppDispatch, useAppSelector } from '../lib/hooks';
 import { setIndex } from '../lib/slices/mainScaffoldSlice';
 
 const NavigationItems = [
