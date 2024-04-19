@@ -47,15 +47,20 @@ export default function TutorsPage() {
       setIsLoading(true);
       const idToken = await user.getIdToken();
       try {
-        const query = { token: idToken };
+        const query = { order_by: 'assistant.created_at' };
         const queryString = new URLSearchParams(query).toString();
-        const res = await fetch(`${url}v1/tutors?${queryString}`);
+        const res = await fetch(`${url}v1/tutors?${queryString}`, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + idToken,
+          },
+        });
         const data = await res.json();
         if (!res.ok) {
-          throw new Error(data?.detail ?? 'Failed to fets personal tutors');
+          throw new Error(data?.detail ?? 'Failed to fetch personal tutors');
         }
 
-        setData(data.data);
+        setData(data);
       } catch (err) {
         setError(err?.message);
       } finally {
@@ -70,12 +75,11 @@ export default function TutorsPage() {
   const createTutor = async (createData) => {
     try {
       const idToken = await user.getIdToken();
-      const query = { token: idToken };
-      const queryString = new URLSearchParams(query).toString();
-      const res = await fetch(`${url}v1/tutors?${queryString}`, {
+      const res = await fetch(`${url}v1/tutors`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + idToken,
         },
         body: JSON.stringify(createData),
       });
@@ -86,7 +90,7 @@ export default function TutorsPage() {
       // If successful, refetch the data to reflect the changes
       toastMessage(
         toast,
-        'Personal tutor create successfully',
+        'Personal tutor created successfully',
         null,
         'success'
       );
@@ -106,12 +110,11 @@ export default function TutorsPage() {
   const updateTutor = async (assistantId, updatedData) => {
     try {
       const idToken = await user.getIdToken();
-      const query = { token: idToken };
-      const queryString = new URLSearchParams(query).toString();
-      const res = await fetch(`${url}v1/tutors/${assistantId}?${queryString}`, {
+      const res = await fetch(`${url}v1/tutors/${assistantId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + idToken,
         },
         body: JSON.stringify(updatedData),
       });
@@ -142,12 +145,11 @@ export default function TutorsPage() {
   const deleteTutor = async (assistantId) => {
     try {
       const idToken = await user.getIdToken();
-      const query = { token: idToken };
-      const queryString = new URLSearchParams(query).toString();
-      const res = await fetch(`${url}v1/tutors/${assistantId}?${queryString}`, {
+      const res = await fetch(`${url}v1/tutors/${assistantId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + idToken,
         },
       });
       const data = await res.json();
@@ -176,25 +178,30 @@ export default function TutorsPage() {
   const columns = [
     {
       header: 'Name',
-      render: (item) => <Text>{item.name}</Text>,
+      render: (item) => <Text>{item.assistant.name}</Text>,
     },
     {
       header: 'Model',
-      render: (item) => <Text>{item.model}</Text>,
+      render: (item) => <Text>{item.assistant.model}</Text>,
     },
     {
       header: 'Instruction',
-      render: (item) => <Text>{item.instructions}</Text>,
+      render: (item) => <Text>{item.assistant.instructions}</Text>,
     },
     {
       header: 'Created',
       render: (item) => (
         <Text>
-          {new Date(item.created_at * 1000).toLocaleDateString('en-GB', {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric',
-          })}
+          {new Date(item.assistant.created_at * 1000).toLocaleDateString(
+            'en-GB',
+            {
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric',
+              hour: 'numeric',
+              minute: '2-digit',
+            }
+          )}
         </Text>
       ),
     },
@@ -209,7 +216,7 @@ export default function TutorsPage() {
       <PtTutorModal
         title={'Edit Personal Tutor'}
         subtitle={'Personal tutor details'}
-        item={item}
+        item={item.assistant}
         onSave={updateTutor}
       >
         <Dialog.Trigger>
@@ -255,7 +262,7 @@ export default function TutorsPage() {
                 Tutors
               </Text>
               <Text color='gray' size='2'>
-                Your Personal Tutors
+                Your personal tutors
               </Text>
             </Flex>
 

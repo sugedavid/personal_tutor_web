@@ -169,8 +169,8 @@ const NavItem = ({ icon, onClick, path, index, children, ...rest }) => {
                 role='group'
                 cursor='pointer'
                 _hover={{
-                  bg: 'purple.500',
-                  color: 'white',
+                  bg: 'purple.100',
+                  color: 'black',
                 }}
                 {...rest}
               >
@@ -179,7 +179,7 @@ const NavItem = ({ icon, onClick, path, index, children, ...rest }) => {
                     mr='4'
                     fontSize='16'
                     _groupHover={{
-                      color: 'white',
+                      color: 'black',
                     }}
                     as={icon}
                   />
@@ -206,11 +206,11 @@ const NavItem = ({ icon, onClick, path, index, children, ...rest }) => {
             cursor='pointer'
             mt={0.5}
             mb={0.5}
-            bg={stateIndex === index ? 'purple.500' : 'transparent'}
-            color={stateIndex === index ? 'white' : 'black'}
+            bg={stateIndex === index ? 'purple.100' : 'transparent'}
+            color={stateIndex === index ? 'black' : 'black'}
             _hover={{
-              bg: 'purple.500',
-              color: 'white',
+              bg: 'purple.100',
+              color: 'black',
             }}
             {...rest}
           >
@@ -219,7 +219,7 @@ const NavItem = ({ icon, onClick, path, index, children, ...rest }) => {
                 mr='4'
                 fontSize='16'
                 _groupHover={{
-                  color: 'white',
+                  color: 'black',
                 }}
                 as={icon}
               />

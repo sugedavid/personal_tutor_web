@@ -80,7 +80,7 @@ export default function PtTutorModal({
           </Dialog.Close>
           <Dialog.Close>
             <Button
-              disabled={!name}
+              disabled={item?.id ? !name && !instruction : !name}
               onClick={() =>
                 item?.id
                   ? onSave(item?.id, {

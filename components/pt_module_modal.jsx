@@ -55,7 +55,7 @@ export default function PtModuleModal({
             <DropdownMenu.Root>
               <DropdownMenu.Trigger>
                 <Button variant='soft'>
-                  {!tutor ? 'Select tutor' : tutor.name}
+                  {!tutor ? 'Select tutor' : tutor?.name}
                   <FiChevronDown />
                 </Button>
               </DropdownMenu.Trigger>
@@ -63,9 +63,9 @@ export default function PtModuleModal({
                 {tutors?.map((item) => (
                   <DropdownMenu.Item
                     key={item.id}
-                    onSelect={() => setTutor(item)}
+                    onSelect={() => setTutor(item?.assistant)}
                   >
-                    {item.name}
+                    {item.assistant.name}
                   </DropdownMenu.Item>
                 ))}
               </DropdownMenu.Content>
@@ -86,11 +86,11 @@ export default function PtModuleModal({
                 item?.id
                   ? onSave(item?.id, {
                       name: name,
-                      assistant_id: tutor.id,
+                      assistant_id: tutor?.id,
                     })
                   : onSave({
                       name: name,
-                      assistant_id: tutor.id,
+                      assistant_id: tutor?.id,
                     })
               }
             >

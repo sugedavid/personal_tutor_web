@@ -1,6 +1,9 @@
 'use client';
 
+import { toastMessage } from '@/components/pt_toast';
 import firebase_app from '@/firebase';
+import { useAppDispatch } from '@/lib/hooks';
+import { setIndex } from '@/lib/slices/mainScaffoldSlice';
 import {
   Avatar,
   Box,
@@ -22,9 +25,10 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { FiChevronDown, FiSend } from 'react-icons/fi';
 import ErrorScaffold from '../error';
-import { toastMessage } from '@/components/pt_toast';
 
 export default function ChatsPage() {
+  const dispatch = useAppDispatch();
+
   const [messages, setMessages] = useState(null);
   const [messageInput, setMessageInput] = useState('');
 
@@ -56,9 +60,14 @@ export default function ChatsPage() {
       setIsLoading(true);
       const idToken = await user.getIdToken();
       try {
-        const query = { token: idToken };
+        const query = { order_by: 'created_at' };
         const queryString = new URLSearchParams(query).toString();
-        const res = await fetch(`${url}v1/modules?${queryString}`);
+        const res = await fetch(`${url}v1/modules?${queryString}`, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + idToken,
+          },
+        });
         const data = await res.json();
         if (!res.ok) {
           throw new Error(data?.detail ?? 'Failed to fetch modules');
@@ -80,26 +89,32 @@ export default function ChatsPage() {
   // fetch messages
   const fetchMessages = async (module) => {
     if (user !== null) {
-      setIsLoading(true);
-      const idToken = await user.getIdToken();
-      try {
-        const query = {
-          token: idToken,
-          thread_id: module?.thread_id,
-        };
-        const queryString = new URLSearchParams(query).toString();
-        const res = await fetch(`${url}v1/messages?${queryString}`);
-        const data = await res.json();
-        if (!res.ok) {
-          throw new Error(data?.detail ?? 'Failed to fetch messages');
-        }
+      if (module?.thread_id) {
+        setIsLoading(true);
+        const idToken = await user.getIdToken();
+        try {
+          const query = {
+            thread_id: module?.thread_id,
+          };
+          const queryString = new URLSearchParams(query).toString();
+          const res = await fetch(`${url}v1/messages?${queryString}`, {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: 'Bearer ' + idToken,
+            },
+          });
+          const data = await res.json();
+          if (!res.ok) {
+            throw new Error(data?.detail ?? 'Failed to fetch messages');
+          }
 
-        setMessages(data?.data?.reverse());
-      } catch (err) {
-        setError(err?.message);
-      } finally {
-        setIsLoading(false);
-        scrollToBottom();
+          setMessages(data?.data?.reverse());
+        } catch (err) {
+          setError(err?.message);
+        } finally {
+          setIsLoading(false);
+          scrollToBottom();
+        }
       }
     } else {
       router.push('/sign_in');
@@ -111,8 +126,6 @@ export default function ChatsPage() {
     if (messageInput.trim() === '') return;
     try {
       const idToken = await user.getIdToken();
-      const query = { token: idToken };
-      const queryString = new URLSearchParams(query).toString();
 
       const newMessage = {
         assistant_id: module?.assistant?.id,
@@ -122,10 +135,11 @@ export default function ChatsPage() {
         instructions: module?.assistant?.instructions,
       };
 
-      const res = await fetch(`${url}v1/messages?${queryString}`, {
+      const res = await fetch(`${url}v1/messages`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + idToken,
         },
         body: JSON.stringify(newMessage),
       });
@@ -200,10 +214,10 @@ export default function ChatsPage() {
         <Flex mt='3' size='3' align='center' gap={2}>
           <Button
             variant='surface'
-            onClick={
-              // Attempt to recover by trying to re-render the segment
-              () => router.push('/dashboard/tutors')
-            }
+            onClick={() => {
+              dispatch(setIndex(1));
+              router.push('/dashboard/tutors');
+            }}
           >
             Create Tutor
           </Button>
@@ -211,10 +225,10 @@ export default function ChatsPage() {
           <Button
             variant='surface'
             color='orange'
-            onClick={
-              // Attempt to recover by trying to re-render the segment
-              () => router.push('/dashboard/modules')
-            }
+            onClick={() => {
+              dispatch(setIndex(2));
+              router.push('/dashboard/modules');
+            }}
           >
             Create Module
           </Button>
