@@ -1,6 +1,6 @@
 'use client';
 
-import toastMessage from '@/components/pt_toast';
+import { toastMessage } from '@/components/pt_toast';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import {
   Box,
@@ -48,7 +48,7 @@ export default function SignUpPage() {
   const handleForm = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${url}v1/register`, {
+      const res = await fetch(`${url}v1/users`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

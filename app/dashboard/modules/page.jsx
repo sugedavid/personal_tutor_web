@@ -49,15 +49,20 @@ export default function ModulesPage() {
       setIsLoading(true);
       const idToken = await user.getIdToken();
       try {
-        const query = { token: idToken };
+        const query = { order_by: 'assistant.created_at' };
         const queryString = new URLSearchParams(query).toString();
-        const res = await fetch(`${url}v1/tutors?${queryString}`);
+        const res = await fetch(`${url}v1/tutors?${queryString}`, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + idToken,
+          },
+        });
         const data = await res.json();
         if (!res.ok) {
           throw new Error(data?.detail ?? 'Failed to fetch tutors');
         }
 
-        setTutors(data.data);
+        setTutors(data);
       } catch (err) {
         setError(err?.message);
       } finally {
@@ -74,9 +79,14 @@ export default function ModulesPage() {
       setIsLoading(true);
       const idToken = await user.getIdToken();
       try {
-        const query = { token: idToken };
+        const query = { order_by: 'created_at' };
         const queryString = new URLSearchParams(query).toString();
-        const res = await fetch(`${url}v1/modules?${queryString}`);
+        const res = await fetch(`${url}v1/modules?${queryString}`, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + idToken,
+          },
+        });
         const data = await res.json();
         if (!res.ok) {
           throw new Error(data?.detail ?? 'Failed to fetch data');
@@ -97,12 +107,11 @@ export default function ModulesPage() {
   const createModule = async (createData) => {
     try {
       const idToken = await user.getIdToken();
-      const query = { token: idToken };
-      const queryString = new URLSearchParams(query).toString();
-      const res = await fetch(`${url}v1/modules?${queryString}`, {
+      const res = await fetch(`${url}v1/modules`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + idToken,
         },
         body: JSON.stringify(createData),
       });
@@ -123,18 +132,14 @@ export default function ModulesPage() {
   const updateModule = async (assistantId, updatedData) => {
     try {
       const idToken = await user.getIdToken();
-      const query = { token: idToken };
-      const queryString = new URLSearchParams(query).toString();
-      const res = await fetch(
-        `${url}v1/modules/${assistantId}?${queryString}`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(updatedData),
-        }
-      );
+      const res = await fetch(`${url}v1/modules/${assistantId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + idToken,
+        },
+        body: JSON.stringify(updatedData),
+      });
       const data = await res.json();
       if (!res.ok) {
         throw new Error(data?.detail);
@@ -152,17 +157,13 @@ export default function ModulesPage() {
   const deleteModule = async (assistantId) => {
     try {
       const idToken = await user.getIdToken();
-      const query = { token: idToken };
-      const queryString = new URLSearchParams(query).toString();
-      const res = await fetch(
-        `${url}v1/modules/${assistantId}?${queryString}`,
-        {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      const res = await fetch(`${url}v1/modules/${assistantId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + idToken,
+        },
+      });
       const data = await res.json();
       if (!res.ok) {
         throw new Error(data?.detail);
@@ -193,6 +194,8 @@ export default function ModulesPage() {
             day: '2-digit',
             month: 'short',
             year: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
           })}
         </Text>
       ),
@@ -256,7 +259,7 @@ export default function ModulesPage() {
                 Modules
               </Text>
               <Text color='gray' size='2'>
-                Your Modules
+                Your modules
               </Text>
             </Flex>
 

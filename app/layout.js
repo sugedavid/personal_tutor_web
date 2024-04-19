@@ -2,7 +2,6 @@ import { Theme } from '@radix-ui/themes';
 import '@radix-ui/themes/styles.css';
 import { Inter } from 'next/font/google';
 import { fonts } from './fonts';
-import './globals.css';
 import { Providers } from './providers';
 import StoreProvider from './StoreProvider';
 
@@ -17,7 +16,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang='en' className={fonts.rubik.variable}>
       <body className={inter.className}>
-        <Theme accentColor='violet'>
+        <Theme accentColor='purple'>
           <StoreProvider index={0}>
             <Providers>{children}</Providers>
           </StoreProvider>
