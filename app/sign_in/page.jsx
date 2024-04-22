@@ -20,9 +20,10 @@ import { useRouter } from 'next/navigation';
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 
-import firebase_app from '@/firebase';
+import firebase_app, { perf } from '@/firebase';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import { trace } from 'firebase/performance';
 
 export default function SignInPage() {
   const {
@@ -50,6 +51,8 @@ export default function SignInPage() {
   }, [user, loading, router]);
 
   const handleForm = (formData) => {
+    const t = trace(perf, 'signIn User');
+    t.start();
     setSignIn(true);
     // sign in
     signInWithEmailAndPassword(auth, email, password)
@@ -75,6 +78,7 @@ export default function SignInPage() {
           isClosable: true,
         });
       });
+    t.stop();
   };
 
   return (
@@ -136,6 +140,7 @@ export default function SignInPage() {
                   />
                   <InputRightElement h={'full'}>
                     <IconButton
+                      type='button'
                       variant='ghost'
                       onClick={() =>
                         setShowPassword((showPassword) => !showPassword)

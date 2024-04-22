@@ -7,6 +7,7 @@ import { Inter } from 'next/font/google';
 import StoreProvider from './StoreProvider';
 import { fonts } from './fonts';
 import { Providers } from './providers';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -25,11 +26,11 @@ export default function RootLayout({ children }) {
       <body className={inter.className}>
         <Theme accentColor='purple'>
           <StoreProvider index={0}>
-            <Providers>
-              {children} <Analytics />
-            </Providers>
+            <Providers>{children}</Providers>
           </StoreProvider>
         </Theme>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

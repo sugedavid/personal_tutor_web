@@ -1,6 +1,7 @@
 'use client';
 
 import { toastMessage } from '@/components/pt_toast';
+import { perf } from '@/firebase';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import {
   Box,
@@ -19,6 +20,7 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { Button, IconButton, Link, Text } from '@radix-ui/themes';
+import { trace } from 'firebase/performance';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import { useForm } from 'react-hook-form';
@@ -46,6 +48,8 @@ export default function SignUpPage() {
 
   // register user
   const handleForm = async () => {
+    const t = trace(perf, 'register User');
+    t.start();
     try {
       setLoading(true);
       const res = await fetch(`${url}v1/users`, {
@@ -80,6 +84,7 @@ export default function SignUpPage() {
     } finally {
       setLoading(false);
     }
+    t.stop();
   };
 
   return (
