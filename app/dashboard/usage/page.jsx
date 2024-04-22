@@ -6,7 +6,7 @@ import PtCreditModal from '@/components/pt_credit_modal';
 import PtPieChart from '@/components/pt_pie_chart';
 import PtTable from '@/components/pt_table';
 import { toastMessage } from '@/components/pt_toast';
-import firebase_app from '@/firebase';
+import firebase_app, { perf } from '@/firebase';
 import { useToast } from '@chakra-ui/react';
 import { Button, Container, Dialog, Flex, Text } from '@radix-ui/themes';
 import { getAuth } from 'firebase/auth';
@@ -15,6 +15,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { FiPlus } from 'react-icons/fi';
 import ErrorScaffold from '../error';
+import { trace } from 'firebase/performance';
 
 export default function UsagePage() {
   const [data, setData] = useState(null);
@@ -43,6 +44,8 @@ export default function UsagePage() {
   // fetch user info
   const fetchUserInfo = async () => {
     if (user !== null) {
+      const t = trace(perf, 'fetch User');
+      t.start();
       setIsLoading(true);
       const idToken = await user.getIdToken();
       try {
@@ -63,6 +66,7 @@ export default function UsagePage() {
       } finally {
         setIsLoading(false);
       }
+      t.stop();
     } else {
       router.push('/sign_in');
     }
@@ -71,6 +75,8 @@ export default function UsagePage() {
   // fetch credits
   const fetchCredits = async () => {
     if (user !== null) {
+      const t = trace(perf, 'fetch Credits');
+      t.start();
       setIsLoading(true);
       const idToken = await user.getIdToken();
       try {
@@ -93,6 +99,7 @@ export default function UsagePage() {
       } finally {
         setIsLoading(false);
       }
+      t.stop();
     } else {
       router.push('/sign_in');
     }
@@ -101,6 +108,8 @@ export default function UsagePage() {
   // fetch credits summary
   const fetchCreditsSummary = async () => {
     if (user !== null) {
+      const t = trace(perf, 'fetch Credits Summary');
+      t.start();
       setIsLoading(true);
       const idToken = await user.getIdToken();
       try {
@@ -139,6 +148,7 @@ export default function UsagePage() {
       } finally {
         setIsLoading(false);
       }
+      t.stop();
     } else {
       router.push('/sign_in');
     }
@@ -146,6 +156,8 @@ export default function UsagePage() {
 
   // add credit
   const addCredit = async (createData) => {
+    const t = trace(perf, 'add Credit');
+    t.start();
     try {
       const idToken = await user.getIdToken();
       const res = await fetch(`${url}v1/credits`, {
@@ -167,8 +179,8 @@ export default function UsagePage() {
       fetchCreditsSummary();
     } catch (err) {
       toastMessage(toast, 'Failed to add credit', err?.message, 'error');
-      setError(err?.message);
     }
+    t.stop();
   };
 
   const columns = [

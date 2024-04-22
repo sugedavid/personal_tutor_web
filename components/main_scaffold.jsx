@@ -28,11 +28,12 @@ import {
 } from 'react-icons/fi';
 import PtAlertDialog from './pt_alert_dialog';
 
-import firebase_app from '@/firebase';
+import firebase_app, { perf } from '@/firebase';
 import { getAuth, signOut } from 'firebase/auth';
 
 import { useAppDispatch, useAppSelector } from '../lib/hooks';
 import { setIndex } from '../lib/slices/mainScaffoldSlice';
+import { trace } from 'firebase/performance';
 
 const NavigationItems = [
   { name: 'Chats', icon: FiMessageSquare, path: '/dashboard/chats' },
@@ -87,6 +88,8 @@ const SidebarContent = ({ onClose, ...rest }) => {
 
   const handleNavigation = (path, index) => {
     if (path === '/sign_in') {
+      const t = trace(perf, 'signOut User');
+      t.start();
       signOut(auth)
         .then(() => {
           dispatch(setIndex(0));
@@ -107,6 +110,7 @@ const SidebarContent = ({ onClose, ...rest }) => {
             isClosable: true,
           });
         });
+      t.stop();
     } else {
       dispatch(setIndex(index));
       router.push(path);

@@ -80,7 +80,7 @@ export default function ModulesPage() {
   // fetch modules
   const fetchModules = async () => {
     if (user !== null) {
-      const t = trace(perf, 'fetch Tutors');
+      const t = trace(perf, 'fetch Modules');
       t.start();
       setIsLoading(true);
       const idToken = await user.getIdToken();
@@ -112,6 +112,8 @@ export default function ModulesPage() {
 
   // create module
   const createModule = async (createData) => {
+    const t = trace(perf, 'create Module');
+    t.start();
     try {
       const idToken = await user.getIdToken();
       const res = await fetch(`${url}v1/modules`, {
@@ -127,16 +129,18 @@ export default function ModulesPage() {
         throw new Error(data?.detail);
       }
       // If successful, refetch the data to reflect the changes
-      toastMessage(toast, 'Module create successfully', null, 'success');
+      toastMessage(toast, 'Module created successfully', null, 'success');
       fetchModules();
     } catch (err) {
       toastMessage(toast, 'Failed to create module', err?.message, 'error');
-      setError(err?.message);
     }
+    t.stop();
   };
 
   // update module
   const updateModule = async (assistantId, updatedData) => {
+    const t = trace(perf, 'update Module');
+    t.start();
     try {
       const idToken = await user.getIdToken();
       const res = await fetch(`${url}v1/modules/${assistantId}`, {
@@ -156,12 +160,14 @@ export default function ModulesPage() {
       fetchModules();
     } catch (err) {
       toastMessage(toast, 'Failed to update module', err?.message, 'error');
-      setError(err?.message);
     }
+    t.stop();
   };
 
   // delete module
   const deleteModule = async (assistantId) => {
+    const t = trace(perf, 'delete Module');
+    t.start();
     try {
       const idToken = await user.getIdToken();
       const res = await fetch(`${url}v1/modules/${assistantId}`, {
@@ -180,8 +186,8 @@ export default function ModulesPage() {
       fetchModules();
     } catch (err) {
       toastMessage(toast, 'Failed to delete module', err?.message, 'error');
-      setError(err?.message);
     }
+    t.stop();
   };
 
   const columns = [

@@ -1,14 +1,12 @@
 // app/dashboard/tutors/page.jsx
 'use client';
 
+import PtAlertDialog from '@/components/pt_alert_dialog';
 import PtTable from '@/components/pt_table';
+import { toastMessage } from '@/components/pt_toast';
+import PtTutorModal from '@/components/pt_tutor_modal';
 import firebase_app, { perf } from '@/firebase';
 import { useToast } from '@chakra-ui/react';
-import { getAuth } from 'firebase/auth';
-import { ErrorBoundary } from 'next/dist/client/components/error-boundary';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import ErrorScaffold from '../error';
 import {
   AlertDialog,
   Button,
@@ -18,11 +16,13 @@ import {
   IconButton,
   Text,
 } from '@radix-ui/themes';
-import PtTutorModal from '@/components/pt_tutor_modal';
-import { FiEdit, FiPlus, FiTrash } from 'react-icons/fi';
-import PtAlertDialog from '@/components/pt_alert_dialog';
-import { toastMessage } from '@/components/pt_toast';
+import { getAuth } from 'firebase/auth';
 import { trace } from 'firebase/performance';
+import { ErrorBoundary } from 'next/dist/client/components/error-boundary';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { FiEdit, FiPlus, FiTrash } from 'react-icons/fi';
+import ErrorScaffold from '../error';
 
 export default function TutorsPage() {
   const [data, setData] = useState(null);
@@ -77,6 +77,8 @@ export default function TutorsPage() {
 
   // create tutor
   const createTutor = async (createData) => {
+    const t = trace(perf, 'create Tutor');
+    t.start();
     try {
       const idToken = await user.getIdToken();
       const res = await fetch(`${url}v1/tutors`, {
@@ -106,12 +108,14 @@ export default function TutorsPage() {
         err?.message,
         'error'
       );
-      setError(err?.message);
     }
+    t.stop();
   };
 
   // update tutor
   const updateTutor = async (assistantId, updatedData) => {
+    const t = trace(perf, 'update Tutor');
+    t.start();
     try {
       const idToken = await user.getIdToken();
       const res = await fetch(`${url}v1/tutors/${assistantId}`, {
@@ -141,12 +145,14 @@ export default function TutorsPage() {
         err?.message,
         'error'
       );
-      setError(err?.message);
     }
+    t.stop();
   };
 
   // delete tutor
   const deleteTutor = async (assistantId) => {
+    const t = trace(perf, 'delete Tutor');
+    t.start();
     try {
       const idToken = await user.getIdToken();
       const res = await fetch(`${url}v1/tutors/${assistantId}`, {
@@ -175,8 +181,8 @@ export default function TutorsPage() {
         err?.message,
         'error'
       );
-      setError(err?.message);
     }
+    t.stop();
   };
 
   const columns = [

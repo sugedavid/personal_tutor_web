@@ -94,7 +94,7 @@ export default function ChatsPage() {
   const fetchMessages = async (module) => {
     if (user !== null) {
       if (module?.thread_id) {
-        const t = trace(perf, 'fetch Messages');
+        const t = trace(perf, 'fetch Chats');
         t.start();
         setIsLoading(true);
         const idToken = await user.getIdToken();
@@ -131,6 +131,8 @@ export default function ChatsPage() {
   // create message
   const createMessage = async () => {
     if (messageInput.trim() === '') return;
+    const t = trace(perf, 'create Chat');
+    t.start();
     try {
       const idToken = await user.getIdToken();
 
@@ -161,6 +163,7 @@ export default function ChatsPage() {
       toastMessage(toast, 'Failed to send message', err?.message, 'error');
       setError(err?.message);
     }
+    t.stop();
   };
 
   // delay the fetch to wait for response from the assistant
