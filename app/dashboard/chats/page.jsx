@@ -1,7 +1,7 @@
 'use client';
 
 import { toastMessage } from '@/components/pt_toast';
-import firebase_app from '@/firebase';
+import firebase_app, { perf } from '@/firebase';
 import { useAppDispatch } from '@/lib/hooks';
 import { setIndex } from '@/lib/slices/mainScaffoldSlice';
 import {
@@ -21,6 +21,7 @@ import {
   TextField,
 } from '@radix-ui/themes';
 import { getAuth } from 'firebase/auth';
+import { trace } from 'firebase/performance';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { FiChevronDown, FiSend } from 'react-icons/fi';
@@ -57,6 +58,8 @@ export default function ChatsPage() {
   // fetch modules
   const fetchModules = async () => {
     if (user !== null) {
+      const t = trace(perf, 'fetch Modules');
+      t.start();
       setIsLoading(true);
       const idToken = await user.getIdToken();
       try {
@@ -81,6 +84,7 @@ export default function ChatsPage() {
       } finally {
         setIsLoading(false);
       }
+      t.stop();
     } else {
       router.push('/sign_in');
     }
@@ -90,6 +94,8 @@ export default function ChatsPage() {
   const fetchMessages = async (module) => {
     if (user !== null) {
       if (module?.thread_id) {
+        const t = trace(perf, 'fetch Messages');
+        t.start();
         setIsLoading(true);
         const idToken = await user.getIdToken();
         try {
@@ -115,6 +121,7 @@ export default function ChatsPage() {
           setIsLoading(false);
           scrollToBottom();
         }
+        t.stop();
       }
     } else {
       router.push('/sign_in');
