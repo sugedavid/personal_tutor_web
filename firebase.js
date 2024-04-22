@@ -1,5 +1,7 @@
+import { getAnalytics } from 'firebase/analytics';
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
+import { getPerformance } from 'firebase/performance';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -15,4 +17,8 @@ const firebaseConfig = {
 const firebase_app = initializeApp(firebaseConfig);
 // Initialize Firebase Authentication and get a reference to the service
 export const auth = getAuth(firebase_app);
+export const analytics =
+  typeof window !== 'undefined' ? getAnalytics(firebase_app) : null;
+export const perf =
+  typeof window !== 'undefined' ? getPerformance(firebase_app) : null;
 export default firebase_app;

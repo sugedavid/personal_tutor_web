@@ -1,9 +1,12 @@
+import firebase_app, { analytics } from '@/firebase';
 import { Theme } from '@radix-ui/themes';
 import '@radix-ui/themes/styles.css';
+import { Analytics } from '@vercel/analytics/react';
+import { initializePerformance } from 'firebase/performance';
 import { Inter } from 'next/font/google';
+import StoreProvider from './StoreProvider';
 import { fonts } from './fonts';
 import { Providers } from './providers';
-import StoreProvider from './StoreProvider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -13,12 +16,18 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+  if (typeof window !== 'undefined') {
+    initializePerformance(firebase_app);
+  }
+
   return (
     <html lang='en' className={fonts.rubik.variable}>
       <body className={inter.className}>
         <Theme accentColor='purple'>
           <StoreProvider index={0}>
-            <Providers>{children}</Providers>
+            <Providers>
+              {children} <Analytics />
+            </Providers>
           </StoreProvider>
         </Theme>
       </body>

@@ -1,14 +1,12 @@
 // app/dashboard/tutors/page.jsx
 'use client';
 
+import PtAlertDialog from '@/components/pt_alert_dialog';
+import PtModuleModal from '@/components/pt_module_modal';
 import PtTable from '@/components/pt_table';
-import firebase_app from '@/firebase';
+import { toastMessage } from '@/components/pt_toast';
+import firebase_app, { perf } from '@/firebase';
 import { useToast } from '@chakra-ui/react';
-import { getAuth } from 'firebase/auth';
-import { ErrorBoundary } from 'next/dist/client/components/error-boundary';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import ErrorScaffold from '../error';
 import {
   AlertDialog,
   Button,
@@ -18,10 +16,13 @@ import {
   IconButton,
   Text,
 } from '@radix-ui/themes';
-import PtModuleModal from '@/components/pt_module_modal';
+import { getAuth } from 'firebase/auth';
+import { trace } from 'firebase/performance';
+import { ErrorBoundary } from 'next/dist/client/components/error-boundary';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { FiEdit, FiPlus, FiTrash } from 'react-icons/fi';
-import PtAlertDialog from '@/components/pt_alert_dialog';
-import { toastMessage } from '@/components/pt_toast';
+import ErrorScaffold from '../error';
 
 export default function ModulesPage() {
   const [data, setData] = useState(null);
@@ -46,6 +47,8 @@ export default function ModulesPage() {
   // fetch tutors
   const fetchTutors = async () => {
     if (user !== null) {
+      const t = trace(perf, 'fetch Tutors');
+      t.start();
       setIsLoading(true);
       const idToken = await user.getIdToken();
       try {
@@ -68,6 +71,7 @@ export default function ModulesPage() {
       } finally {
         setIsLoading(false);
       }
+      t.stop();
     } else {
       router.push('/sign_in');
     }
@@ -76,6 +80,8 @@ export default function ModulesPage() {
   // fetch modules
   const fetchModules = async () => {
     if (user !== null) {
+      const t = trace(perf, 'fetch Tutors');
+      t.start();
       setIsLoading(true);
       const idToken = await user.getIdToken();
       try {
@@ -98,6 +104,7 @@ export default function ModulesPage() {
       } finally {
         setIsLoading(false);
       }
+      t.stop();
     } else {
       router.push('/sign_in');
     }

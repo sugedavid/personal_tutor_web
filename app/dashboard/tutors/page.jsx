@@ -2,7 +2,7 @@
 'use client';
 
 import PtTable from '@/components/pt_table';
-import firebase_app from '@/firebase';
+import firebase_app, { perf } from '@/firebase';
 import { useToast } from '@chakra-ui/react';
 import { getAuth } from 'firebase/auth';
 import { ErrorBoundary } from 'next/dist/client/components/error-boundary';
@@ -22,6 +22,7 @@ import PtTutorModal from '@/components/pt_tutor_modal';
 import { FiEdit, FiPlus, FiTrash } from 'react-icons/fi';
 import PtAlertDialog from '@/components/pt_alert_dialog';
 import { toastMessage } from '@/components/pt_toast';
+import { trace } from 'firebase/performance';
 
 export default function TutorsPage() {
   const [data, setData] = useState(null);
@@ -44,6 +45,8 @@ export default function TutorsPage() {
   // fetch tutors
   const fetchTutors = async () => {
     if (user !== null) {
+      const t = trace(perf, 'fetch Tutors');
+      t.start();
       setIsLoading(true);
       const idToken = await user.getIdToken();
       try {
@@ -66,6 +69,7 @@ export default function TutorsPage() {
       } finally {
         setIsLoading(false);
       }
+      t.stop();
     } else {
       router.push('/sign_in');
     }
